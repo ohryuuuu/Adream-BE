@@ -22,6 +22,7 @@ export class User extends BaseEntity {
     @Column({
         type: "enum",
         enum: UserType,
+        default: UserType.GENERAL
     })
     type: UserType;
 

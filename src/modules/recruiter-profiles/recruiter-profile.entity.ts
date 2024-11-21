@@ -2,7 +2,7 @@ import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "t
 import { User } from "src/modules/users/user.entity";
 import { BusinessType } from "./constants/business-type.enum";
 
-@Entity('recruiter-profiles')
+@Entity('recruiter_profiles')
 export class RecruiterProfile extends BaseEntity {
     
     @PrimaryGeneratedColumn('uuid')

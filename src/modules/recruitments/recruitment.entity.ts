@@ -1,19 +1,14 @@
 import { PriceRange } from "src/modules/recruitments/constants/price-range.enum";
-import { RecruitmentStatus } from "src/modules/recruitments/constants/recruitment-status.enum";
+import { ReviewStatus } from "src/modules/recruitments/constants/review-status.enum";
 import { SupportMethod } from "src/modules/recruitments/constants/support-method.enum";
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { RecruiterProfile } from "../recruiter-profiles/recruiter-profile.entity";
 
 @Entity('recruitments')
 export class Recruitment extends BaseEntity {
 
     @PrimaryGeneratedColumn('uuid')
     id: string;
-
-    @Column({
-        type: "enum",
-        enum: RecruitmentStatus
-    })
-    status: RecruitmentStatus;
 
     @Column()
     title: string;
@@ -51,7 +46,18 @@ export class Recruitment extends BaseEntity {
     createdAt: Date;
 
     @Column({
-        type: "text"
+        type: "enum",
+        enum: ReviewStatus,
+        default: ReviewStatus.WAITING,
+    })
+    reviewStatus: ReviewStatus;
+
+    @Column({
+        type: "text",
+        nullable: true
     })
     rejectReason: string;
+
+    @ManyToOne(type => RecruiterProfile)
+    recruiterProfile: RecruiterProfile;
 }
