@@ -5,7 +5,7 @@ import * as crypto from 'crypto';
 import { Builder } from "builder-pattern";
 import { User } from "../users/user.entity";
 import { EmailAlreadyExistsException } from "./exceptions/email-already-exsist.exception";
-import { NotSamePasswordException } from "./exceptions/not-same-password.exception";
+import { NotSamePasswordException } from "./exceptions/not-same-password.exception"
 import { JwtPayload } from "./payload/jwt.payload";
 import { JwtService } from "@nestjs/jwt";
 import { SignInDto } from "./dto/req/sign-in.dto";
