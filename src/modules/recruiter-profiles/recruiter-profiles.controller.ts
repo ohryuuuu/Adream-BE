@@ -1,17 +1,19 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt_auth.guard';
 import { GetUserId } from '../auth/decorators/get-user-id.decorator';
 import { RecruiterProfilesService } from './recruiter-profiles.service';
 import { AddRecruiterProfileDto } from './dto/req/add-recruiter-profile.dto';
 import { UpdateRecruiterProfileDto } from './dto/req/update-recruiter-profile.dto';
-import { IsBusinessWorkingDto } from './dto/req/is-business-working.dto';
+import { BusinessInfoDto } from './dto/req/business-info.dto';
+import { NationalTaxService } from './national-tax-service.api';
 
 @UseGuards(JwtAuthGuard)
-@Controller('recruiter-profiles')
+@Controller('recruiter_profiles')
 export class RecruiterProfilesController {
 
     constructor(
         private recruiterProfilesService : RecruiterProfilesService,
+        private nationalTaxService : NationalTaxService,
     ) {}
 
     @Get('my')
@@ -35,8 +37,8 @@ export class RecruiterProfilesController {
     }
 
     @Get('is_business_working')
-    async isBusinessWorking(@Body() isBusinessWorkingDto : IsBusinessWorkingDto) {
-        return await this.recruiterProfilesService.isBusinessWorking(isBusinessWorkingDto);
+    async isBusinessWorking(@Body() isBusinessWorkingDto : BusinessInfoDto) {
+        return await this.nationalTaxService.isBusinessWorking(isBusinessWorkingDto);
     }
 
 }

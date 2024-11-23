@@ -9,7 +9,8 @@ import { UpdateRecruiterProfileDto } from './dto/req/update-recruiter-profile.dt
 import { User } from '../users/user.entity';
 import { NotOwnProfileException } from './exceptions/not-own-profile.exception';
 import { NotWorkingBusinessException } from './exceptions/not-working-business.exception';
-import { IsBusinessWorkingDto } from './dto/req/is-business-working.dto';
+import { BusinessInfoDto } from './dto/req/business-info.dto';
+import { NationalTaxService } from './national-tax-service.api';
 
 @Injectable()
 export class RecruiterProfilesService {
@@ -17,6 +18,7 @@ export class RecruiterProfilesService {
     constructor(
         private recruiterProfilesRepository : RecruiterProfilesRepository,
         private usersRepository: UsersRepository,
+        private nationalTaxService : NationalTaxService,
     ) {}
 
     private readonly ExpirationTermDays = 365;
@@ -27,7 +29,7 @@ export class RecruiterProfilesService {
 
     @Transactional()
     async addMyRecruiterProfile(userId: string, addDto: AddRecruiterProfileDto) {
-        await this.checkBusinessWorking({businessNumber : addDto.businessNumber, businessName : addDto.businessName, representativeName: addDto.representativeName});
+        await this.checkBusinessWorking({businessNumber : addDto.businessNumber, businessName : addDto.businessName, representativeName: addDto.representativeName, businessStartDate: addDto.businessStartDate, businessType : addDto.businessType});
         const user = await this.usersRepository.getOneById(userId);
         const expirationDate = this.getExpirationDate();
         const newRecruiterProfile = Builder<RecruiterProfile>(RecruiterProfile)
@@ -48,7 +50,7 @@ export class RecruiterProfilesService {
         const user = await this.usersRepository.getOneById(userId);
         const profile = await this.recruiterProfilesRepository.getOneById(profileId);
         await this.checkOwnProfile(user, profile);
-        await this.checkBusinessWorking({businessNumber : profile.businessNumber, businessName : updateDto.businessName, representativeName: updateDto.representativeName});
+        await this.checkBusinessWorking({businessNumber : profile.businessNumber, businessName : updateDto.businessName, representativeName: updateDto.representativeName, businessStartDate: updateDto.businessStartDate, businessType: updateDto.businessType});
         profile.contactEmail = updateDto.contactEmail;
         profile.businessType = updateDto.businessType;
         profile.businessName = updateDto.businessName;
@@ -66,12 +68,7 @@ export class RecruiterProfilesService {
         await profile.softRemove();
     }
 
-    async isBusinessWorking(isBusinessWorkingDto : IsBusinessWorkingDto) {
-        //1. 국세청에서 데이터 조회
-        //2. 운영중인지 체크
-        //3. 운영여부 반환
-        return true;
-    }
+
 
 
     private async checkOwnProfile(user: User, profile : RecruiterProfile) : Promise<void> {
@@ -79,8 +76,8 @@ export class RecruiterProfilesService {
         if(user.id !== userId) throw new NotOwnProfileException();
     }
 
-    private async checkBusinessWorking(isBusinessWorkingDto : IsBusinessWorkingDto) {
-        const isWorking = await this.isBusinessWorking(isBusinessWorkingDto);
+    private async checkBusinessWorking(BusinessInfoDto : BusinessInfoDto) {
+        const isWorking = await this.nationalTaxService.isBusinessWorking(BusinessInfoDto);
         if(!isWorking) throw new NotWorkingBusinessException();
     }
 

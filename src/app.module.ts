@@ -10,9 +10,13 @@ import { RecruiterProfilesModule } from './modules/recruiter-profiles/recruiter-
 import { RecruitmentsModule } from './modules/recruitments/recruitments.module';
 import { UsersModule } from './modules/users/users.module';
 import { dbConfig } from './config/db.config';
+import { dataSourceFactory } from "./config/typeorm/data-source-factory"
+import { CacheModule } from '@nestjs/cache-manager';
+
 
 @Module({
   imports: [
+    CacheModule.register(),
     AlarmsModule,
     ApplicationsModule,
     AuthModule,
@@ -22,7 +26,12 @@ import { dbConfig } from './config/db.config';
     RecruiterProfilesModule,
     RecruitmentsModule,
     UsersModule,
-    TypeOrmModule.forRoot(dbConfig)
+    TypeOrmModule.forRootAsync({
+      useFactory() {
+        return dbConfig;
+      },
+      dataSourceFactory,
+    })
   ],
   exports : [TypeOrmModule]
 })

@@ -19,6 +19,9 @@ export class UpdateRecruiterProfileDto {
     representativeName : string; //대표자명
 
     @IsString()
+    businessStartDate: string;
+
+    @IsString()
     businessName: string; //상호명
 
 }

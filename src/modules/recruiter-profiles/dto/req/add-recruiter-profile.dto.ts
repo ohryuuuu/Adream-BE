@@ -1,22 +1,10 @@
 import { IsString, IsUrl } from "class-validator";
-import { BusinessType } from "../../constants/business-type.enum";
+import { BusinessInfoDto } from "./business-info.dto";
 
-export class AddRecruiterProfileDto {
+export class AddRecruiterProfileDto extends BusinessInfoDto {
     
     @IsString()
     contactEmail: string;
-
-    @IsString()
-    businessNumber: string; //사업자등록번호
-
-    @IsString()
-    businessType: BusinessType; //개인, 법인
-
-    @IsString()
-    businessName: string; //상호명
-
-    @IsString()
-    representativeName : string; //대표자명
 
     @IsString()
     proofWay: string; //신분증(대표의경우), 재직증명서(직원의경우)
