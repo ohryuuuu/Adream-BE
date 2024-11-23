@@ -8,6 +8,8 @@ import { Builder } from 'builder-pattern';
 import { Recruitment } from './recruitment.entity';
 import { ReviewStatus } from './constants/review-status.enum';
 import { DeadlineTightException } from './exceptions/deadline-tight.exception';
+import { ReviewRecruitmentDto } from './dto/req/review-recruitment.dto';
+import { Transactional } from 'typeorm-transactional';
 
 @Injectable()
 export class RecruitmentsService {
@@ -19,6 +21,7 @@ export class RecruitmentsService {
         private recruiterProfilesService : RecruiterProfilesService
     ) {}
 
+    @Transactional()
     async addRecruitment(userId:string, addDto: AddRecruitmentDto) {
         const user = await this.usersRepository.getOneById(userId);
         const recruiterProfile = await this.recruiterProfileRepository.getOneById(addDto.recruiterProfileId);
@@ -33,13 +36,38 @@ export class RecruitmentsService {
         .priceRangeType(addDto.priceRangeType)
         .price(addDto.price)
         .recruiterProfile(recruiterProfile)
+        .review("심사를 대기합니다")
         .reviewStatus(ReviewStatus.WAITING)
         .build();
         await newRecruitment.save();
     }
 
-
+    @Transactional()
+    async reviewRecruitment(recruitmentId:string, reviewDto: ReviewRecruitmentDto) :Promise<void> {
+        const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
+        recruitment.review = reviewDto.review;
+        recruitment.reviewStatus = reviewDto.reviewStatus;
+        await recruitment.save();
+        //알림날리기
+    }
     
+    async editRecruitment(userId:string, recruitmentId:string, editDto:AddRecruitmentDto) {
+        const user = await this.usersRepository.getOneById(userId);
+        const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
+        const recruiterProfile = await recruitment?.recruiterProfile;
+        await this.recruiterProfilesService.checkOwnProfile(user, recruiterProfile);
+        await this.checkDeadline(editDto.deadline);
+        recruitment.title = editDto.title;
+        recruitment.description = editDto.description;
+        recruitment.deadline = editDto.deadline;
+        recruitment.supportMethodA = editDto.supportMethodA;
+        recruitment.supportMethodB = editDto.supportMethodB;
+        recruitment.priceRangeType = editDto.priceRangeType;
+        recruitment.price = editDto.price;
+        recruitment.reviewStatus = ReviewStatus.WAITING;
+        recruitment.review = "재심사를 대기합니다";
+        await recruitment.save();
+    }
 
     private async checkDeadline(deadline: Date) {
         const todayDate = new Date();

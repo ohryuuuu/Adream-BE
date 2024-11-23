@@ -60,8 +60,10 @@ export class Recruitment extends BaseEntity {
         type: "text",
         nullable: true
     })
-    rejectReason: string;
+    review: string;
 
-    @ManyToOne(type => RecruiterProfile)
-    recruiterProfile: RecruiterProfile;
+    @ManyToOne(type => RecruiterProfile, {
+        lazy:true
+    })
+    recruiterProfile?: RecruiterProfile | Promise<RecruiterProfile>;
 }
