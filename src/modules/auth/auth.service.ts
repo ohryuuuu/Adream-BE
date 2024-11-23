@@ -1,27 +1,28 @@
 import { Transactional } from "typeorm-transactional";
-import { UserRepository } from "../users/user.repository";
+import { UsersRepository } from "../users/users.repository";
 import { SignUpDto } from "./dto/req/sign-up.dto";
 import * as crypto from 'crypto';
 import { Builder } from "builder-pattern";
 import { User } from "../users/user.entity";
 import { EmailAlreadyExistsException } from "./exceptions/email-already-exsist.exception";
 import { NotSamePasswordException } from "./exceptions/not-same-password.exception"
-import { JwtPayload } from "./payload/jwt.payload";
+import { JwtPayload } from "./payloads/jwt.payload";
 import { JwtService } from "@nestjs/jwt";
 import { SignInDto } from "./dto/req/sign-in.dto";
 import { Injectable } from "@nestjs/common";
+import { Response } from "express";
 
 
 @Injectable()
 export class AuthService {
 
     constructor(
-        private userRepository: UserRepository,
+        private userRepository: UsersRepository,
         private jwtService: JwtService,
     ) {}
 
     @Transactional()
-    async signUp(signUpDto : SignUpDto) : Promise<void> {
+    public async signUp(signUpDto : SignUpDto) : Promise<void> {
         const sameEmail = await this.userRepository.findOneByEmail(signUpDto.email);
         if(sameEmail) throw new EmailAlreadyExistsException();
         const hashedPassword = this.hashPassword(signUpDto.password);
@@ -34,7 +35,7 @@ export class AuthService {
     }
 
     @Transactional()
-    async signIn(signInDto : SignInDto) : Promise<string> {
+    public async signIn(res:Response, signInDto:SignInDto) : Promise<void> {
         const user = await this.userRepository.getOneByEmail(signInDto.email);
         const isSamePass = this.comparePasswords(signInDto.password, user.password);
         if(!isSamePass) throw new NotSamePasswordException();
@@ -44,18 +45,21 @@ export class AuthService {
         .name(user.name)
         .type(user.type)
         .build()
-        const token = this.jwtService.sign(payload);
-        return token;
+        const accessToken = this.jwtService.sign(payload);
+        this.setAccessToken(res, accessToken);
     }
 
-    async isEmailAvailable(email:string) : Promise<boolean> {
+    public async signOut(res : Response) : Promise<void> {
+        await this.clearAccessToken(res);
+    }
+
+    public async isEmailAvailable(email:string) : Promise<boolean> {
         const user = await this.userRepository.findOneByEmail(email);
         return !user;
     }
 
-
     private hashPassword(password: string): string {
-        const hash = crypto.createHmac('sha256', 'secretKey')
+        const hash = crypto.createHmac('sha256', process.env['CRYPTO_SECRETKEY'])
         .update(password)
         .digest('hex');
         return hash;
@@ -64,6 +68,14 @@ export class AuthService {
     private comparePasswords(password: string, storedPasswordHash: string): boolean {
         const hash = this.hashPassword(password);
         return hash === storedPasswordHash;
+    }
+
+    private async setAccessToken(res:Response, accessToken:string) {
+        res.cookie("access_token", accessToken).send();
+    }
+
+    private async clearAccessToken(res:Response) {
+        res.clearCookie("access_token").send();
     }
 
 }

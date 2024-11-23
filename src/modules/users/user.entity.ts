@@ -1,5 +1,5 @@
 import { UserType } from "src/modules/users/constants/user-type.enum";
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -8,12 +8,14 @@ export class User extends BaseEntity {
     id: string;
 
     @Column()
-    username: string;
-
-    @Column()
     email: string;
 
     @Column()
+    name : string;
+
+    @Column({
+        nullable: true,
+    })
     phoneNumber: string;
 
     @Column()
@@ -27,6 +29,9 @@ export class User extends BaseEntity {
     type: UserType;
 
     @CreateDateColumn()
-    createdAt : Date;
+    createdAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 
 }

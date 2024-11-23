@@ -1,22 +1,23 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtModule } from '@nestjs/jwt';
-import { jwtConfig } from 'src/config/jwt.config';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { acccessTokenJwtConfig } from 'src/config/jwt.config';
 import { TypeOrmExModule } from 'src/config/typeorm/typeorm-ex.module';
-import { UserRepository } from '../users/user.repository';
+import { UsersRepository } from '../users/users.repository';
 import { PassportModule } from '@nestjs/passport';
-import 'dotenv/config';
-import { passportConfig } from 'src/config/passport.config';
+import { JwtStrategy } from './strategies/jwt.strategy';
+
 
 
 @Module({
   imports: [
-    PassportModule.register(passportConfig),
-    JwtModule.register(jwtConfig),
-    TypeOrmExModule.forCustomRepository([UserRepository])
+    PassportModule,
+    JwtModule.register(acccessTokenJwtConfig),
+    TypeOrmExModule.forCustomRepository([UsersRepository])
   ],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [AuthService, JwtStrategy],
+  exports : [AuthService, JwtModule, JwtStrategy]
 })
 export class AuthModule {}

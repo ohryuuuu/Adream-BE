@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "src/modules/users/user.entity";
 import { BusinessType } from "./constants/business-type.enum";
 
@@ -21,7 +21,7 @@ export class RecruiterProfile extends BaseEntity {
     businessNumber: string; //사업자등록번호
 
     @Column()
-    businessName: string;
+    businessName: string; //상호명
 
     @Column()
     proofWay: string; //신분증(대표의경우), 재직증명서(직원의경우)
@@ -29,7 +29,21 @@ export class RecruiterProfile extends BaseEntity {
     @Column()
     proofImg: string; //증명서가 찍힌 사진 이미지
 
-    @ManyToOne(type => User)
-    user: User;
+    @Column()
+    expirationAt: Date; //만료일
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
+
+    @ManyToOne(type => User, {
+        lazy: true,
+    })
+    user?: User | Promise<User>;
+
+
+
 
 }
