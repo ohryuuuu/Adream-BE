@@ -10,6 +10,7 @@ import { NationalTaxService } from './national-tax-service.api';
 @Module({
   imports: [HttpModule, TypeOrmExModule.forCustomRepository([UsersRepository, RecruiterProfilesRepository])],
   controllers: [RecruiterProfilesController],
-  providers: [RecruiterProfilesService, NationalTaxService]
+  providers: [RecruiterProfilesService, NationalTaxService],
+  exports : [RecruiterProfilesService, NationalTaxService]
 })
 export class RecruiterProfilesModule {}

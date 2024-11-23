@@ -1,4 +1,4 @@
-import { IsDate, IsDateString, IsEnum, IsNumberString, IsString, Length } from "class-validator";
+import { IsEnum, IsNumberString, IsString, Length } from "class-validator";
 import { BusinessType } from "../../constants/business-type.enum";
 
 export class BusinessInfoDto {

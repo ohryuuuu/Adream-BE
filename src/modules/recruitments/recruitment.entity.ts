@@ -26,17 +26,21 @@ export class Recruitment extends BaseEntity {
 
     @Column({
         type: "enum",
-        enum: SupportMethod
+        enum: SupportMethod,
+        nullable: true,
     })
     supportMethodB: SupportMethod;
 
     @Column({
         type: "enum",
         enum: PriceRange,
+        nullable: true
     })
-    priceRangeType: PriceRange
+    priceRangeType: PriceRange;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     price: number;
 
     @Column()

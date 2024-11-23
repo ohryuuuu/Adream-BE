@@ -23,6 +23,7 @@ export class RecruiterProfilesService {
 
     private readonly ExpirationTermDays = 365;
 
+    @Transactional()
     async getMyRecruiterProfiles(userId: string) : Promise<RecruiterProfile[]> {
         return await this.recruiterProfilesRepository.findByUserId(userId);
     }
@@ -71,7 +72,7 @@ export class RecruiterProfilesService {
 
 
 
-    private async checkOwnProfile(user: User, profile : RecruiterProfile) : Promise<void> {
+    async checkOwnProfile(user: User, profile : RecruiterProfile) : Promise<void> {
         const userId = (await profile?.user)?.id;
         if(user.id !== userId) throw new NotOwnProfileException();
     }
