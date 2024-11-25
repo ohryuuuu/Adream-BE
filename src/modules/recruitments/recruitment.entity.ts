@@ -1,14 +1,15 @@
 import { PriceRange } from "src/modules/recruitments/constants/price-range.enum";
 import { ReviewStatus } from "src/modules/recruitments/constants/review-status.enum";
 import { SupportMethod } from "src/modules/recruitments/constants/support-method.enum";
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { RecruiterProfile } from "../recruiter-profiles/recruiter-profile.entity";
+import { randomUUID } from "crypto";
 
 @Entity('recruitments')
 export class Recruitment extends BaseEntity {
 
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn('increment')
+    id: number;
 
     @Column()
     title: string;
@@ -66,4 +67,5 @@ export class Recruitment extends BaseEntity {
         lazy:true
     })
     recruiterProfile?: RecruiterProfile | Promise<RecruiterProfile>;
+
 }

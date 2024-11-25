@@ -10,6 +10,8 @@ import { ReviewStatus } from './constants/review-status.enum';
 import { DeadlineTightException } from './exceptions/deadline-tight.exception';
 import { ReviewRecruitmentDto } from './dto/req/review-recruitment.dto';
 import { Transactional } from 'typeorm-transactional';
+import { CursorPaginationReqDto } from 'src/common/dto/req/cursor-pagination-req.dto';
+import { CursorPaginationResDto } from 'src/common/dto/res/cursor-pagination-res.dto';
 
 @Injectable()
 export class RecruitmentsService {
@@ -43,7 +45,7 @@ export class RecruitmentsService {
     }
 
     @Transactional()
-    async reviewRecruitment(recruitmentId:string, reviewDto: ReviewRecruitmentDto) :Promise<void> {
+    async reviewRecruitment(recruitmentId:number, reviewDto: ReviewRecruitmentDto) :Promise<void> {
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
         recruitment.review = reviewDto.review;
         recruitment.reviewStatus = reviewDto.reviewStatus;
@@ -51,7 +53,8 @@ export class RecruitmentsService {
         //알림날리기
     }
     
-    async editRecruitment(userId:string, recruitmentId:string, editDto:AddRecruitmentDto) {
+    @Transactional()
+    async editRecruitment(userId:string, recruitmentId:number, editDto:AddRecruitmentDto) {
         const user = await this.usersRepository.getOneById(userId);
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
         const recruiterProfile = await recruitment?.recruiterProfile;
@@ -69,11 +72,22 @@ export class RecruitmentsService {
         await recruitment.save();
     }
 
+    @Transactional()
+    async findRecruitments(paginationReqDto: CursorPaginationReqDto) : Promise<CursorPaginationResDto<Recruitment>> {
+        const [data, total] =  await this.recruitmentsRepository.findApproved(paginationReqDto.cursorId, paginationReqDto.take, paginationReqDto.createdOrder);
+        return new CursorPaginationResDto<Recruitment>(data, total, paginationReqDto);
+    }
+
+    @Transactional()
+    async findRecruitmentsByRecruiterProfileId(profileId: string) {
+        return await this.recruitmentsRepository.findByRecruiterProfileId(profileId);
+    }
+
     private async checkDeadline(deadline: Date) {
-        const todayDate = new Date();
-        const deadlineDate = new Date(deadline);
-        const minDate = new Date(todayDate.setDate(todayDate.getDate() + 1));
-        if(deadlineDate > minDate) {
+        const nowDateTime = new Date();
+        const deadlineDateTime = new Date(deadline);
+        const minDateTime = new Date(nowDateTime.getTime() +  (1 * 24 * 36000));
+        if(deadlineDateTime.getTime() < minDateTime.getTime()) {
             throw new DeadlineTightException();
         }
     }

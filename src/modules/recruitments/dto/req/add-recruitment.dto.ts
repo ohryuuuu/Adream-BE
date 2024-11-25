@@ -1,4 +1,4 @@
-import { IsDate, IsEnum, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsDate, IsDateString, IsEnum, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
 import { SupportMethod } from "../../constants/support-method.enum";
 import { PriceRange } from "../../constants/price-range.enum";
 
@@ -28,7 +28,7 @@ export class AddRecruitmentDto {
     @IsNumber()
     price: number;
 
-    @IsDate()
+    @IsDateString()
     deadline: Date;
 
 }

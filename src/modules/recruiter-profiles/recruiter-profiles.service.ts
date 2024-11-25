@@ -70,8 +70,6 @@ export class RecruiterProfilesService {
     }
 
 
-
-
     async checkOwnProfile(user: User, profile : RecruiterProfile) : Promise<void> {
         const userId = (await profile?.user)?.id;
         if(user.id !== userId) throw new NotOwnProfileException();
