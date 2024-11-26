@@ -2,16 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../users/users.repository';
 import { RecruiterProfilesRepository } from '../recruiter-profiles/recruiter-profiles.repository';
 import { RecruitmentsRepository } from './recruitments.repository';
-import { RecruiterProfilesService } from '../recruiter-profiles/recruiter-profiles.service';
 import { AddRecruitmentDto } from './dto/req/add-recruitment.dto';
-import { Builder } from 'builder-pattern';
-import { Recruitment } from './recruitment.entity';
-import { ReviewStatus } from './constants/review-status.enum';
 import { DeadlineTightException } from './exceptions/deadline-tight.exception';
 import { ReviewRecruitmentDto } from './dto/req/review-recruitment.dto';
 import { Transactional } from 'typeorm-transactional';
-import { CursorPaginationReqDto } from 'src/common/dto/req/cursor-pagination-req.dto';
-import { CursorPaginationResDto } from 'src/common/dto/res/cursor-pagination-res.dto';
+import {  PaginateQuery } from 'nestjs-paginate';
+import { EditRecruitmentDto } from './dto/req/edit-recruitment.dto';
+
 
 @Injectable()
 export class RecruitmentsService {
@@ -20,27 +17,15 @@ export class RecruitmentsService {
         private usersRepository: UsersRepository,
         private recruiterProfileRepository: RecruiterProfilesRepository,
         private recruitmentsRepository: RecruitmentsRepository,
-        private recruiterProfilesService : RecruiterProfilesService
     ) {}
 
     @Transactional()
     async addRecruitment(userId:string, addDto: AddRecruitmentDto) {
         const user = await this.usersRepository.getOneById(userId);
         const recruiterProfile = await this.recruiterProfileRepository.getOneById(addDto.recruiterProfileId);
-        await this.recruiterProfilesService.checkOwnProfile(user, recruiterProfile);
+        await recruiterProfile.checkOwnProfile(user);
         await this.checkDeadline(addDto.deadline);
-        const newRecruitment = Builder(Recruitment)
-        .title(addDto.title)
-        .description(addDto.description)
-        .deadline(addDto.deadline)
-        .supportMethodA(addDto.supportMethodA)
-        .supportMethodB(addDto.supportMethodB)
-        .priceRangeType(addDto.priceRangeType)
-        .price(addDto.price)
-        .recruiterProfile(recruiterProfile)
-        .review("심사를 대기합니다")
-        .reviewStatus(ReviewStatus.WAITING)
-        .build();
+        const newRecruitment = this.recruitmentsRepository.create({ ...addDto, recruiterProfile });
         await newRecruitment.save();
     }
 
@@ -54,34 +39,20 @@ export class RecruitmentsService {
     }
     
     @Transactional()
-    async editRecruitment(userId:string, recruitmentId:number, editDto:AddRecruitmentDto) {
+    async editRecruitment(userId:string, recruitmentId:number, editDto:EditRecruitmentDto) {
         const user = await this.usersRepository.getOneById(userId);
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
         const recruiterProfile = await recruitment?.recruiterProfile;
-        await this.recruiterProfilesService.checkOwnProfile(user, recruiterProfile);
+        await recruiterProfile.checkOwnProfile(user);
         await this.checkDeadline(editDto.deadline);
-        recruitment.title = editDto.title;
-        recruitment.description = editDto.description;
-        recruitment.deadline = editDto.deadline;
-        recruitment.supportMethodA = editDto.supportMethodA;
-        recruitment.supportMethodB = editDto.supportMethodB;
-        recruitment.priceRangeType = editDto.priceRangeType;
-        recruitment.price = editDto.price;
-        recruitment.reviewStatus = ReviewStatus.WAITING;
-        recruitment.review = "재심사를 대기합니다";
-        await recruitment.save();
+        await this.recruitmentsRepository.update(recruitmentId, { ...editDto });
     }
 
-    @Transactional()
-    async findRecruitments(paginationReqDto: CursorPaginationReqDto) : Promise<CursorPaginationResDto<Recruitment>> {
-        const [data, total] =  await this.recruitmentsRepository.findApproved(paginationReqDto.cursorId, paginationReqDto.take, paginationReqDto.createdOrder);
-        return new CursorPaginationResDto<Recruitment>(data, total, paginationReqDto);
+    async getRecruitments(query : PaginateQuery) {
+        //
     }
 
-    @Transactional()
-    async findRecruitmentsByRecruiterProfileId(profileId: string) {
-        return await this.recruitmentsRepository.findByRecruiterProfileId(profileId);
-    }
+
 
     private async checkDeadline(deadline: Date) {
         const nowDateTime = new Date();

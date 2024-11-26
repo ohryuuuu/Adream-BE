@@ -31,8 +31,9 @@ import { CacheModule } from '@nestjs/cache-manager';
         return dbConfig;
       },
       dataSourceFactory,
-    })
+    }),
   ],
-  exports : [TypeOrmModule]
+  exports : [TypeOrmModule],
+  providers: []
 })
 export class AppModule {}

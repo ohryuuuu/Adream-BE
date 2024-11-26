@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import axios, { AxiosInstance } from "axios";
-import { BusinessInfoDto } from "./dto/req/business-info.dto";
+import {  BusinessDto } from "./dto/req/business.dto";
+import { NotWorkingBusinessException } from "./exceptions/not-working-business.exception";
 
 @Injectable()
 export class NationalTaxService {
@@ -14,12 +15,12 @@ export class NationalTaxService {
         this.axios.defaults.headers['Authorization'] = NationalTaxService.authKey;
     }
 
-    async isBusinessWorking(businessInfoDto : BusinessInfoDto) : Promise<boolean> {
+    async isBusinessWorking(businessInfoDto : BusinessDto) : Promise<boolean> {
         const businessObj = {
-            b_no: businessInfoDto.businessNumber,
-            start_dt: businessInfoDto.businessStartDate,
+            b_no: businessInfoDto.number,
+            start_dt: businessInfoDto.startDate,
             p_nm: businessInfoDto.representativeName,
-            b_nm: businessInfoDto.businessName
+            b_nm: businessInfoDto.name
         }
         try {
             const { data } = await this.axios.post(`/validate?serviceKey=${NationalTaxService.authKey}`, {
@@ -33,6 +34,11 @@ export class NationalTaxService {
         } catch(e) {
             return false;
         }
+    }
+
+    async checkBusinessWorking(BusinessDto : BusinessDto) {
+        const isWorking = await this.isBusinessWorking(BusinessDto);
+        if(!isWorking) throw new NotWorkingBusinessException();
     }
 
 

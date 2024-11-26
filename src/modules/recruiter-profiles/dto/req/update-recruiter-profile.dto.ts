@@ -1,7 +1,10 @@
-import { IsString } from "class-validator";
-import { BusinessInfoDto } from "./business-info.dto";
+import { IsString, ValidateNested } from "class-validator";
+import { BusinessDto } from "./business.dto";
 
-export class UpdateRecruiterProfileDto extends BusinessInfoDto {
+export class UpdateRecruiterProfileDto {
+
+    @ValidateNested()
+    business: BusinessDto;
 
     @IsString()
     contactEmail: string;

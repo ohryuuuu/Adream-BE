@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { GetUserId } from '../auth/decorators/get-user-id.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt_auth.guard';
 import { AddRecruitmentDto } from './dto/req/add-recruitment.dto';
 import { RecruitmentsService } from './recruitments.service';
 import { ReviewRecruitmentDto } from './dto/req/review-recruitment.dto';
-import { UserType } from '../users/constants/user-type.enum';
-import { CursorPaginationReqDto } from 'src/common/dto/req/cursor-pagination-req.dto';
+import { PaginateQuery } from 'nestjs-paginate';
+import { EditRecruitmentDto } from './dto/req/edit-recruitment.dto';
 
 @Controller('recruitments')
 export class RecruitmentsController {
@@ -15,9 +15,10 @@ export class RecruitmentsController {
     ) {}
 
     @Get()
-    async findRecruitments(@Query() cursorPaginationReqDto: CursorPaginationReqDto) {
-        return await this.recruitmentsService.findRecruitments(cursorPaginationReqDto);
+    async findRecruitment(@Query() query : PaginateQuery) {
+        return await this.recruitmentsService.getRecruitments(query);
     }
+
 
     @Post()
     @UseGuards(JwtAuthGuard)
@@ -25,7 +26,13 @@ export class RecruitmentsController {
         return await this.recruitmentsService.addRecruitment(userId, addRecruitmentDto);
     }
 
-    @Patch('/:recruitment_id')
+    @Put('/:recruitment_id')
+    @UseGuards(JwtAuthGuard)
+    async editRecruitment(@GetUserId() userId: string,@Param('recruitment_id', ParseIntPipe) recruitmentId: number, @Body() editRecruitmentDto : EditRecruitmentDto) {
+        return await this.recruitmentsService.editRecruitment(userId, recruitmentId, editRecruitmentDto);
+    }
+
+    @Patch('/review/:recruitment_id')
     @UseGuards(JwtAuthGuard)
     // @Roles(UserType.ADMIN)
     async reviewRecruitment(@Param('recruitment_id', ParseIntPipe) recruitmentId: number, @Body() reviewRecruitmentDto : ReviewRecruitmentDto) {

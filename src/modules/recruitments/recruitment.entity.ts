@@ -1,9 +1,8 @@
 import { PriceRange } from "src/modules/recruitments/constants/price-range.enum";
 import { ReviewStatus } from "src/modules/recruitments/constants/review-status.enum";
 import { SupportMethod } from "src/modules/recruitments/constants/support-method.enum";
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { RecruiterProfile } from "../recruiter-profiles/recruiter-profile.entity";
-import { randomUUID } from "crypto";
 
 @Entity('recruitments')
 export class Recruitment extends BaseEntity {
@@ -64,7 +63,10 @@ export class Recruitment extends BaseEntity {
     review: string;
 
     @ManyToOne(type => RecruiterProfile, {
-        lazy:true
+        lazy:true,
+    })
+    @JoinColumn({
+        name : "recruiterProfileId"
     })
     recruiterProfile?: RecruiterProfile | Promise<RecruiterProfile>;
 

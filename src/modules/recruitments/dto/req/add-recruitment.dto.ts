@@ -1,8 +1,17 @@
-import { IsDate, IsDateString, IsEnum, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import {  IsDate, IsDateString, IsEnum, IsIn, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
 import { SupportMethod } from "../../constants/support-method.enum";
 import { PriceRange } from "../../constants/price-range.enum";
+import { ReviewStatus } from "../../constants/review-status.enum";
 
 export class AddRecruitmentDto {
+
+
+    @IsIn([ReviewStatus.WAITING])
+    @IsEnum(ReviewStatus)
+    readonly reviewStatus: ReviewStatus = ReviewStatus.WAITING;
+
+    @IsString()
+    readonly review: string = "심사를 대기합니다";
 
     @IsUUID()
     recruiterProfileId: string;
@@ -28,7 +37,8 @@ export class AddRecruitmentDto {
     @IsNumber()
     price: number;
 
-    @IsDateString()
+    @IsDate()
     deadline: Date;
+
 
 }

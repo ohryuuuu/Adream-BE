@@ -15,7 +15,7 @@ export const dbConfig: TypeOrmModuleOptions = {
     port: Number(process.env['DB_PORT'] ?? 3306),
     username: process.env['DB_USERNAME'],
     password: process.env['DB_PASSWORD'],
-    database: process.env['DB_NAME'],
+    database: process.env['DB_NAME'] ?? "test",
     entities: [Alarms, Application, FcmToken, InfluencerCategory, InfluencerProfile, RecruiterProfile, Recruitment, User],// 설정 부분
     synchronize: true,
 }

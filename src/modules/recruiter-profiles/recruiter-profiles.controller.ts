@@ -4,7 +4,7 @@ import { GetUserId } from '../auth/decorators/get-user-id.decorator';
 import { RecruiterProfilesService } from './recruiter-profiles.service';
 import { AddRecruiterProfileDto } from './dto/req/add-recruiter-profile.dto';
 import { UpdateRecruiterProfileDto } from './dto/req/update-recruiter-profile.dto';
-import { BusinessInfoDto } from './dto/req/business-info.dto';
+import { BusinessDto } from './dto/req/business.dto';
 import { NationalTaxService } from './national-tax-service.api';
 
 @UseGuards(JwtAuthGuard)
@@ -37,7 +37,7 @@ export class RecruiterProfilesController {
     }
 
     @Get('is_business_working')
-    async isBusinessWorking(@Body() isBusinessWorkingDto : BusinessInfoDto) {
+    async isBusinessWorking(@Body() isBusinessWorkingDto : BusinessDto) {
         return await this.nationalTaxService.isBusinessWorking(isBusinessWorkingDto);
     }
 

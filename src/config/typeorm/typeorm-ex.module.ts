@@ -4,11 +4,10 @@ import { DataSource } from 'typeorm';
 import { TYPEORM_EX_CUSTOM_REPOSITORY } from './typeorm-ex.decorator';
 
 export class TypeOrmExModule {
-	public static forCustomRepository<T extends new (...args: any[]) => any>(
-repositories: T[]): DynamicModule {
+	public static forCustomRepository<T extends new (...args: any[]) => any>(repositories: T[]): DynamicModule {
 		const providers: Provider[] = [];
 
-		for (const repository of repositories) {
+	for (const repository of repositories) {
 		const entity = Reflect.getMetadata(TYPEORM_EX_CUSTOM_REPOSITORY,repository);
 
 		if (!entity) {
