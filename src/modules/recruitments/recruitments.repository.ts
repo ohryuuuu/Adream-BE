@@ -9,11 +9,12 @@ export class RecruitmentsRepository extends Repository<Recruitment> {
 
     async getOneById(id:number) {
         const recruitment = await this.findOneBy({
-            id
+            id,
         });
         if(!recruitment) throw new NotFoundException();
         return recruitment;
     }
+
 
 
 }

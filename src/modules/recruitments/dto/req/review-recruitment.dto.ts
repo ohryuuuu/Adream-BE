@@ -4,10 +4,10 @@ import { ReviewStatus } from "../../constants/review-status.enum";
 export class ReviewRecruitmentDto {
 
     @IsEnum(ReviewStatus)
-    reviewStatus: ReviewStatus;
+    status: ReviewStatus;
 
     @IsOptional()
     @IsString()
-    review: string;
+    content: string;
 
 }

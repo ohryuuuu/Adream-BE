@@ -8,6 +8,7 @@ import { ReviewRecruitmentDto } from './dto/req/review-recruitment.dto';
 import { Transactional } from 'typeorm-transactional';
 import {  PaginateQuery } from 'nestjs-paginate';
 import { EditRecruitmentDto } from './dto/req/edit-recruitment.dto';
+import { RecruitmentDetailDto } from './dto/res/recruitment-detail.dto';
 
 
 @Injectable()
@@ -32,8 +33,8 @@ export class RecruitmentsService {
     @Transactional()
     async reviewRecruitment(recruitmentId:number, reviewDto: ReviewRecruitmentDto) :Promise<void> {
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
-        recruitment.review = reviewDto.review;
-        recruitment.reviewStatus = reviewDto.reviewStatus;
+        recruitment.review.content = reviewDto.content;
+        recruitment.review.status = reviewDto.status;
         await recruitment.save();
         //알림날리기
     }
@@ -47,6 +48,21 @@ export class RecruitmentsService {
         await this.checkDeadline(editDto.deadline);
         await this.recruitmentsRepository.update(recruitmentId, { ...editDto });
     }
+    
+
+
+    @Transactional()
+    async getRecruitmentDetail(recruitmentId: number) : Promise<any> {
+        const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
+        const recruiterProfile = await recruitment?.recruiterProfile;
+        const authorUser =  await recruiterProfile?.user;
+        const returnDto = new RecruitmentDetailDto(recruitment);
+        returnDto.setAuthor(authorUser);
+        returnDto.setRecruiterProfile(recruiterProfile);
+        return returnDto;
+    }
+
+
 
     async getRecruitments(query : PaginateQuery) {
         //

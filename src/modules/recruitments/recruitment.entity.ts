@@ -3,6 +3,7 @@ import { ReviewStatus } from "src/modules/recruitments/constants/review-status.e
 import { SupportMethod } from "src/modules/recruitments/constants/support-method.enum";
 import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { RecruiterProfile } from "../recruiter-profiles/recruiter-profile.entity";
+import { AdminReview } from "./children-entities/review.entity";
 
 @Entity('recruitments')
 export class Recruitment extends BaseEntity {
@@ -49,18 +50,8 @@ export class Recruitment extends BaseEntity {
     @CreateDateColumn()
     createdAt: Date;
 
-    @Column({
-        type: "enum",
-        enum: ReviewStatus,
-        default: ReviewStatus.WAITING,
-    })
-    reviewStatus: ReviewStatus;
-
-    @Column({
-        type: "text",
-        nullable: true
-    })
-    review: string;
+    @Column(() => AdminReview)
+    review : AdminReview;
 
     @ManyToOne(type => RecruiterProfile, {
         lazy:true,

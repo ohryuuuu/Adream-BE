@@ -19,6 +19,10 @@ export class RecruitmentsController {
         return await this.recruitmentsService.getRecruitments(query);
     }
 
+    @Get('/:recruitment_id')
+    async getRecruitmentDetail(@Param('recruitment_id',ParseIntPipe) recruitmentId: number) {
+        return await this.recruitmentsService.getRecruitmentDetail(recruitmentId);
+    }
 
     @Post()
     @UseGuards(JwtAuthGuard)
