@@ -4,8 +4,8 @@ import { SignUpDto } from "./dto/req/sign-up.dto";
 import * as crypto from 'crypto';
 import { Builder } from "builder-pattern";
 import { User } from "../users/user.entity";
-import { EmailAlreadyExistsException } from "./exceptions/email-already-exsist.exception";
-import { NotSamePasswordException } from "./exceptions/not-same-password.exception"
+import { EmailAlreadyExistsException } from "./exceptions/email-already-exsists.exception";
+import { PasswordIsNotCorrectException } from "./exceptions/password-is-not-correct.exception"
 import { JwtPayload } from "./payloads/jwt.payload";
 import { JwtService } from "@nestjs/jwt";
 import { SignInDto } from "./dto/req/sign-in.dto";
@@ -38,7 +38,7 @@ export class AuthService {
     public async signIn(res:Response, signInDto:SignInDto) : Promise<void> {
         const user = await this.userRepository.getOneByEmail(signInDto.email);
         const isSamePass = this.comparePasswords(signInDto.password, user.password);
-        if(!isSamePass) throw new NotSamePasswordException();
+        if(!isSamePass) throw new PasswordIsNotCorrectException();
         const payload = Builder<JwtPayload>()
         .id(user.id)
         .email(user.email)

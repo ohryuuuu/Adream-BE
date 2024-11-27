@@ -6,7 +6,7 @@ import { Transactional } from 'typeorm-transactional';
 import { UsersRepository } from '../users/users.repository';
 import { UpdateRecruiterProfileDto } from './dto/req/update-recruiter-profile.dto';
 import { NationalTaxService } from './national-tax-service.api';
-import { NotSameBusinessNumException } from './exceptions/not-same-business-num.exception';
+import { BusinessNumIsNotSameException } from './exceptions/business-num-is-not-same.exception';
 import { generateExpirationDate } from 'src/common/utils/date';
 
 @Injectable()
@@ -36,12 +36,11 @@ export class RecruiterProfilesService {
 
     @Transactional()
     async updateMyRecruiterProfile(userId: string, profileId: string, updateDto: UpdateRecruiterProfileDto) {
-        const user = await this.usersRepository.getOneById(userId);
         const profile = await this.recruiterProfilesRepository.getOneById(profileId);
-        await profile.checkOwnProfile(user);
+        await profile.checkOwnProfile(userId);
         const expirationAt = generateExpirationDate(this.ExpirationTermDays);
         await this.recruiterProfilesRepository.update(profileId, { ...updateDto, expirationAt });
-        if(updateDto.business.number !== profile.business.number) throw new NotSameBusinessNumException();
+        if(updateDto.business.number !== profile.business.number) throw new BusinessNumIsNotSameException();
         await this.nationalTaxService.checkBusinessWorking(updateDto.business);
     }
 
@@ -49,7 +48,7 @@ export class RecruiterProfilesService {
     async deleteMyRecruiterProfile(userId: string, profileId: string) {
         const user = await this.usersRepository.findOneById(userId);
         const profile = await this.recruiterProfilesRepository.getOneById(profileId);
-        await profile.checkOwnProfile(user);
+        await profile.checkOwnProfile(user.id);
         await this.recruiterProfilesRepository.softRemove(profile);
     }
 

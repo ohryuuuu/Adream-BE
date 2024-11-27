@@ -1,7 +1,9 @@
 import { SocialPlatform } from "src/modules/influencer-profiles/constants/social-platform.enum";
 import { User } from "src/modules/users/user.entity";
-import { BaseEntity, Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { InfluencerCategory } from "../influencer-categories/influencer-category.entity";
+import { ProfileIsNotOwnException } from "./exceptions/profile-is-not-own.exception";
+import { VerifyStatus } from "./constants/verify-status.enum";
 
 
 @Entity('influencer_profiles')
@@ -27,13 +29,35 @@ export class InfluencerProfile extends BaseEntity {
     })
     contactEmail: string;
 
+    @Column({
+        type:"enum",
+        enum : VerifyStatus
+    })
+    verifyStatus : VerifyStatus = VerifyStatus.BEFORE;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
     @UpdateDateColumn()
     updateAt: Date;
 
-    @ManyToOne(type => User)
-    user: User;
+    @DeleteDateColumn()
+    deletedAt: Date;
 
-    @ManyToMany(type => InfluencerCategory)
+    @ManyToOne(type => User, {
+        lazy: true
+    })
+    user: User | Promise<User>;
+
+    @ManyToMany(type => InfluencerCategory, {
+        eager: true
+    })
     categories: InfluencerCategory[];
+
+
+    async checkOwnProfile(userId: string) : Promise<void> {
+        const userId_ = (await this?.user)?.id;
+        if(userId_ !== userId) throw new ProfileIsNotOwnException();
+    }
 
 }

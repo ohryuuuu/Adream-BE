@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import axios, { AxiosInstance } from "axios";
 import {  BusinessDto } from "./dto/req/business.dto";
-import { NotWorkingBusinessException } from "./exceptions/not-working-business.exception";
+import { BusinessIsNotWorkingException } from "./exceptions/business-is-not-working.exception";
 
 @Injectable()
 export class NationalTaxService {
@@ -38,7 +38,7 @@ export class NationalTaxService {
 
     async checkBusinessWorking(BusinessDto : BusinessDto) {
         const isWorking = await this.isBusinessWorking(BusinessDto);
-        if(!isWorking) throw new NotWorkingBusinessException();
+        if(!isWorking) throw new BusinessIsNotWorkingException();
     }
 
 
