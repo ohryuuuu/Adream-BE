@@ -1,22 +1,20 @@
-import { Exclude, Expose } from "class-transformer";
 import { SocialPlatform } from "../../constants/social-platform.enum";
+import { IsArray, IsEnum, IsString, Max, Min } from "class-validator";
 
-@Exclude()
 export class AddMyInfluencerProfileDto {
 
-    @Expose()
+    @IsString()
     tagId: string;
 
-    @Expose()
-    followerCnt: string;
-
-    @Expose()
+    @IsEnum(SocialPlatform)
     platform: SocialPlatform;
 
-    @Expose()
+    @IsString()
     contactEmail: string;
 
-    @Expose()
+    @IsString({
+        each:true
+    })
     categoryIds: string[];
 
 }

@@ -5,11 +5,11 @@ import { TypeOrmExModule } from 'src/config/typeorm/typeorm-ex.module';
 import { InfluencerProfileRepository } from './influencer-profiles.repository';
 import { UsersRepository } from '../users/users.repository';
 import { InfluencerCategoriesRepository } from '../influencer-categories/influencer-categories.repository';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
-  imports: [TypeOrmExModule.forCustomRepository([InfluencerProfileRepository, UsersRepository, InfluencerCategoriesRepository])],
+  imports: [CacheModule.register(), TypeOrmExModule.forCustomRepository([InfluencerProfileRepository, UsersRepository, InfluencerCategoriesRepository])],
   controllers: [InfluencerProfilesController],
   providers: [InfluencerProfilesService]
 })
 export class InfluencerProfilesModule {}
-

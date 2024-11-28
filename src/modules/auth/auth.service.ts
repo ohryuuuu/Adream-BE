@@ -3,7 +3,6 @@ import { UsersRepository } from "../users/users.repository";
 import { SignUpDto } from "./dto/req/sign-up.dto";
 import * as crypto from 'crypto';
 import { Builder } from "builder-pattern";
-import { User } from "../users/user.entity";
 import { EmailAlreadyExistsException } from "./exceptions/email-already-exsists.exception";
 import { PasswordIsNotCorrectException } from "./exceptions/password-is-not-correct.exception"
 import { JwtPayload } from "./payloads/jwt.payload";
@@ -26,12 +25,8 @@ export class AuthService {
         const sameEmail = await this.userRepository.findOneByEmail(signUpDto.email);
         if(sameEmail) throw new EmailAlreadyExistsException();
         const hashedPassword = this.hashPassword(signUpDto.password);
-        const newUser = Builder(User)
-        .email(signUpDto.email)
-        .password(hashedPassword)
-        .name(signUpDto.name)
-        .build();
-        await newUser.save();
+        const newUser = this.userRepository.create({...signUpDto, password: hashedPassword});
+        await this.userRepository.save(newUser);
     }
 
     @Transactional()
@@ -44,7 +39,7 @@ export class AuthService {
         .email(user.email)
         .name(user.name)
         .type(user.type)
-        .build()
+        .build();
         const accessToken = this.jwtService.sign(payload);
         this.setAccessToken(res, accessToken);
     }

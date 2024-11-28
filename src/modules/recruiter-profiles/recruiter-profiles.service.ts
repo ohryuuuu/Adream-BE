@@ -29,8 +29,14 @@ export class RecruiterProfilesService {
     async addMyRecruiterProfile(userId: string, addDto: AddRecruiterProfileDto) {
         const user = await this.usersRepository.getOneById(userId);
         const expirationAt = generateExpirationDate(this.ExpirationTermDays);
-        const newRecruiterProfile = this.recruiterProfilesRepository.create({ ...addDto, user, expirationAt });
-        await newRecruiterProfile.save();
+        const newRecruiterProfile = this.recruiterProfilesRepository.create({
+            business: addDto.business,
+            proof: addDto.proof,
+            contactEmail: addDto.contactEmail, 
+            user,
+            expirationAt 
+        });
+        await this.recruiterProfilesRepository.save(newRecruiterProfile);
         await this.nationalTaxService.checkBusinessWorking(addDto.business);
     }
 

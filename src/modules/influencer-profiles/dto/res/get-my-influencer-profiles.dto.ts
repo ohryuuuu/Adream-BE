@@ -21,6 +21,7 @@ export class GetMyInfluencerProfilesItemDto {
         this.contactEmail = influencerProfile.contactEmail;
         this.followerCnt = influencerProfile.followerCnt;
         this.verifyStatus = influencerProfile.verifyStatus;
+        this.categories = influencerProfile.categories
     }
 
 }

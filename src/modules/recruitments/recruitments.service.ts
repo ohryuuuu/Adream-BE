@@ -23,8 +23,34 @@ export class RecruitmentsService {
         const recruiterProfile = await this.recruiterProfileRepository.getOneById(addDto.recruiterProfileId);
         await recruiterProfile.checkOwnProfile(userId);
         await this.checkDeadline(addDto.deadline);
-        const newRecruitment = this.recruitmentsRepository.create({ ...addDto, recruiterProfile });
-        await newRecruitment.save();
+        const newRecruitment = this.recruitmentsRepository.create({     
+            title: addDto.title,
+            description : addDto.description,
+            supportMethodA: addDto.supportMethodA,
+            supportMethodB: addDto.supportMethodB,
+            priceRangeType: addDto.priceRangeType,
+            price: addDto.price,
+            deadline: addDto.deadline,
+            recruiterProfile
+        });
+        await this.recruitmentsRepository.save(newRecruitment);
+    }
+    
+    @Transactional()
+    async editRecruitment(userId:string, recruitmentId:number, editDto:EditRecruitmentDto) {
+        const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
+        const recruiterProfile = await recruitment?.recruiterProfile;
+        await recruiterProfile.checkOwnProfile(userId);
+        await this.checkDeadline(editDto.deadline);
+        await this.recruitmentsRepository.update(recruitmentId, { 
+            title: editDto.title,
+            description : editDto.description,
+            supportMethodA: editDto.supportMethodA,
+            supportMethodB: editDto.supportMethodB,
+            priceRangeType: editDto.priceRangeType,
+            price: editDto.price,
+            deadline: editDto.deadline,
+        });
     }
 
     @Transactional()
@@ -35,17 +61,6 @@ export class RecruitmentsService {
         await recruitment.save();
         //알림날리기
     }
-    
-    @Transactional()
-    async editRecruitment(userId:string, recruitmentId:number, editDto:EditRecruitmentDto) {
-        const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
-        const recruiterProfile = await recruitment?.recruiterProfile;
-        await recruiterProfile.checkOwnProfile(userId);
-        await this.checkDeadline(editDto.deadline);
-        await this.recruitmentsRepository.update(recruitmentId, { ...editDto });
-    }
-    
-
 
     @Transactional()
     async getRecruitmentDetail(recruitmentId: number) : Promise<RecruitmentDetailDto> {
@@ -59,11 +74,7 @@ export class RecruitmentsService {
     }
 
 
-
-    async getRecruitments(query : PaginateQuery) {
-        //
-    }
-
+    async getRecruitments(query : PaginateQuery) {}
 
 
     private async checkDeadline(deadline: Date) {

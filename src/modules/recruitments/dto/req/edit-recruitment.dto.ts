@@ -1,4 +1,4 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude } from "class-transformer";
 import { AddRecruitmentDto } from "./add-recruitment.dto";
 import { IsEmpty } from "class-validator";
 

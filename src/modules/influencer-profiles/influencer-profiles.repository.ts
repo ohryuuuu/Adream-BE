@@ -3,6 +3,7 @@ import { InfluencerProfile } from "./influencer-profile.entity";
 import { Repository } from "typeorm";
 import { NotFoundException } from "@nestjs/common";
 import { SocialPlatform } from "./constants/social-platform.enum";
+import { VerifyStatus } from "./constants/verify-status.enum";
 
 @CustomRepository(InfluencerProfile)
 export class InfluencerProfileRepository extends Repository<InfluencerProfile> {
@@ -34,5 +35,11 @@ export class InfluencerProfileRepository extends Repository<InfluencerProfile> {
         });
     }
     
+
+    async updateVerifyStatus(id:string, verifyStatus: VerifyStatus) {
+        await this.update(id, {
+            verifyStatus
+        });
+    }
 
 }

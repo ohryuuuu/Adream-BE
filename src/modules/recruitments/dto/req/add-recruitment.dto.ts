@@ -42,4 +42,17 @@ export class AddRecruitmentDto {
     @IsDate()
     deadline: Date;
 
+
+    getEntityLike() {
+        return {
+            title : this.title,
+            description : this.description,
+            supportMethodA: this.supportMethodA,
+            supportMethodB: this.supportMethodB,
+            priceRangeType: this.priceRangeType,
+            price: this.price,
+            deadline: this.deadline,
+        }
+    }
+
 }

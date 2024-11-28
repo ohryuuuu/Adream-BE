@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { InfluencerProfile } from "../influencer-profiles/influencer-profile.entity";
 
 @Entity('influencer_categories')
 export class InfluencerCategory extends BaseEntity {
@@ -16,5 +17,8 @@ export class InfluencerCategory extends BaseEntity {
         nullable: true
     })
     description: string;
+
+    @ManyToMany(() => InfluencerProfile, influencerProfile => influencerProfile.categories)
+    influencerProfiles : InfluencerProfile[];
     
 }
