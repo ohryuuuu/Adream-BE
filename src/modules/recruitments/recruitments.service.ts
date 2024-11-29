@@ -5,7 +5,6 @@ import { AddRecruitmentDto } from './dto/req/add-recruitment.dto';
 import { DeadlineIsTooTightException } from './exceptions/deadline-is-too-tight.exception';
 import { ReviewRecruitmentDto } from './dto/req/review-recruitment.dto';
 import { Transactional } from 'typeorm-transactional';
-import {  PaginateQuery } from 'nestjs-paginate';
 import { EditRecruitmentDto } from './dto/req/edit-recruitment.dto';
 import { RecruitmentDetailDto } from './dto/res/recruitment-detail.dto';
 
@@ -19,7 +18,7 @@ export class RecruitmentsService {
     ) {}
 
     @Transactional()
-    async addRecruitment(userId:string, addDto: AddRecruitmentDto) {
+    async addRecruitment(userId:string, addDto: AddRecruitmentDto) : Promise<void> {
         const recruiterProfile = await this.recruiterProfileRepository.getOneById(addDto.recruiterProfileId);
         await recruiterProfile.checkOwnProfile(userId);
         await this.validateDeadline(addDto.deadline);
@@ -37,7 +36,7 @@ export class RecruitmentsService {
     }
     
     @Transactional()
-    async editRecruitment(userId:string, recruitmentId:number, editDto:EditRecruitmentDto) {
+    async editRecruitment(userId:string, recruitmentId:number, editDto:EditRecruitmentDto) : Promise<void> {
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
         const recruiterProfile = await recruitment?.recruiterProfile;
         await recruiterProfile.checkOwnProfile(userId);
@@ -54,7 +53,7 @@ export class RecruitmentsService {
     }
 
     @Transactional()
-    async reviewRecruitment(recruitmentId:number, reviewDto: ReviewRecruitmentDto) :Promise<void> {
+    async reviewRecruitment(recruitmentId:number, reviewDto: ReviewRecruitmentDto) : Promise<void> {
         await this.recruitmentsRepository.updateReview(recruitmentId, reviewDto);
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
         //알림날리기
@@ -75,10 +74,10 @@ export class RecruitmentsService {
     }
 
 
-    async getRecruitments(query : PaginateQuery) {}
+    // async getRecruitments(query : PaginateQuery) {}
 
 
-    private async validateDeadline(deadline: Date) {
+    private async validateDeadline(deadline: Date) : Promise<void> {
         const nowDateTime = new Date();
         const deadlineDateTime = new Date(deadline);
         const minDateTime = new Date(nowDateTime.getTime() +  (1 * 24 * 36000));

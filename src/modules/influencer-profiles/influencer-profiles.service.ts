@@ -46,7 +46,7 @@ export class InfluencerProfilesService {
     }
 
     @Transactional()
-    async addMyInfluencerProfile(userId:string, addDto : AddMyInfluencerProfileDto) {
+    async addMyInfluencerProfile(userId:string, addDto : AddMyInfluencerProfileDto) : Promise<void> {
         const user = await this.usersRepository.getOneById(userId);
         const categories = await this.categoriesRepository.findByCategoryIds(addDto.categoryIds);
         const sameprofile = await this.influencerProfilesRepository.findSameOneInMyInfluencerProfiles(addDto.platform, addDto.tagId, userId);
@@ -65,7 +65,7 @@ export class InfluencerProfilesService {
     }
 
     @Transactional()
-    async updateMyInfluencerProfile(userId:string, influencerProfileId : string, updateDto : UpdateMyInfluencerProfileDto) {
+    async updateMyInfluencerProfile(userId:string, influencerProfileId : string, updateDto : UpdateMyInfluencerProfileDto) : Promise<void> {
         const influencerProfile = await this.influencerProfilesRepository.getOneById(influencerProfileId);
         await influencerProfile.checkOwnProfile(userId);
         const categories = await this.categoriesRepository.findByCategoryIds(updateDto.categoryIds);
@@ -79,7 +79,7 @@ export class InfluencerProfilesService {
     }
 
     @Transactional()
-    async getVerifyCode(influencerProfileId: string) {
+    async getVerifyCode(influencerProfileId: string) : Promise<string> {
         const verifyCode = generateRandomStr(6);
         await this.cacheManager.set(CACHE_KEYS.INFLUENCER_PROFILE_VERIFY_CODE(influencerProfileId), verifyCode, this.VERIFY_EXP_MS);
         await this.influencerProfilesRepository.updateVerifyStatus(influencerProfileId, VerifyStatus.PROCESSING);
@@ -88,7 +88,7 @@ export class InfluencerProfilesService {
 
 
     @Transactional()
-    async verifyProfile(influencerProfileId:string) {
+    async verifyProfile(influencerProfileId:string) : Promise<void> {
         const influencerProfile = await this.influencerProfilesRepository.getOneById(influencerProfileId);
         const socialInfo = await this.socialPlatformsService.getSocialProfiileByTagId(influencerProfile.platform ,influencerProfile.tagId);
         const verifyCode = await this.cacheManager.get(CACHE_KEYS.INFLUENCER_PROFILE_VERIFY_CODE(influencerProfileId)) as string;

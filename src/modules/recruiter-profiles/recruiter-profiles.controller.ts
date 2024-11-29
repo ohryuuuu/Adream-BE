@@ -5,7 +5,7 @@ import { RecruiterProfilesService } from './recruiter-profiles.service';
 import { AddRecruiterProfileDto } from './dto/req/add-recruiter-profile.dto';
 import { UpdateRecruiterProfileDto } from './dto/req/update-recruiter-profile.dto';
 import { BusinessDto } from './dto/req/business.dto';
-import { NationalTaxService } from './national-tax-service.api';
+import { NationalTaxService } from './national-tax.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('recruiter_profiles')

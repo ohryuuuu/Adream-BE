@@ -12,6 +12,7 @@ import { UsersModule } from './modules/users/users.module';
 import { dbConfig } from './config/db.config';
 import { dataSourceFactory } from "./config/typeorm/data-source-factory"
 import { CacheModule } from '@nestjs/cache-manager';
+import { SocialPlatformsModule } from './modules/social-platforms/social-platforms.module';
 
 
 @Module({
@@ -26,6 +27,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     RecruiterProfilesModule,
     RecruitmentsModule,
     UsersModule,
+    SocialPlatformsModule,
     TypeOrmModule.forRootAsync({
       useFactory() {
         return dbConfig;

@@ -65,11 +65,11 @@ export class AuthService {
         return hash === storedPasswordHash;
     }
 
-    private async setAccessToken(res:Response, accessToken:string) {
+    private async setAccessToken(res:Response, accessToken:string) : Promise<void> {
         res.cookie("access_token", accessToken).send();
     }
 
-    private async clearAccessToken(res:Response) {
+    private async clearAccessToken(res:Response) : Promise<void> {
         res.clearCookie("access_token").send();
     }
 

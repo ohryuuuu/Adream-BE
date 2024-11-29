@@ -35,8 +35,4 @@ export class YoutubeService implements SocialPlatformService {
         return socialProfile;
     }
 
-    // async findProfileById() {
-
-    // }
-
 }

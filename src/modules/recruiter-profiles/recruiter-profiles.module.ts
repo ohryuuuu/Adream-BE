@@ -5,7 +5,7 @@ import { TypeOrmExModule } from 'src/config/typeorm/typeorm-ex.module';
 import { RecruiterProfilesRepository } from './recruiter-profiles.repository';
 import { UsersRepository } from '../users/users.repository';
 import { HttpModule } from '@nestjs/axios';
-import { NationalTaxService } from './national-tax-service.api';
+import { NationalTaxService } from './national-tax.service';
 
 @Module({
   imports: [HttpModule, TypeOrmExModule.forCustomRepository([UsersRepository, RecruiterProfilesRepository])],

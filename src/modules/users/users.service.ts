@@ -13,6 +13,7 @@ export class UsersService {
         private authService : AuthService
     ) {}
 
+    @Transactional()
     async getMe(userId: string) : Promise<GetMeDto> {
         const user = await this.usersRepository.getOneById(userId);
         const getMeDto = new GetMeDto(user);
@@ -25,7 +26,5 @@ export class UsersService {
         await this.usersRepository.softRemove(user);
         await this.authService.signOut(res);
     }
-
-    
     
 }

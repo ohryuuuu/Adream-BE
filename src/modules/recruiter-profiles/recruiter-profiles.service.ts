@@ -5,7 +5,7 @@ import { AddRecruiterProfileDto } from './dto/req/add-recruiter-profile.dto';
 import { Transactional } from 'typeorm-transactional';
 import { UsersRepository } from '../users/users.repository';
 import { UpdateRecruiterProfileDto } from './dto/req/update-recruiter-profile.dto';
-import { NationalTaxService } from './national-tax-service.api';
+import { NationalTaxService } from './national-tax.service';
 import { BusinessNumIsNotSameException } from './exceptions/business-num-is-not-same.exception';
 import { generateExpirationDate } from 'src/common/utils/date';
 
@@ -26,7 +26,7 @@ export class RecruiterProfilesService {
     }
 
     @Transactional()
-    async addMyRecruiterProfile(userId: string, addDto: AddRecruiterProfileDto) {
+    async addMyRecruiterProfile(userId: string, addDto: AddRecruiterProfileDto) : Promise<void> {
         const user = await this.usersRepository.getOneById(userId);
         const expirationAt = generateExpirationDate(this.ExpirationTermDays);
         const newRecruiterProfile = this.recruiterProfilesRepository.create({
@@ -41,7 +41,7 @@ export class RecruiterProfilesService {
     }
 
     @Transactional()
-    async updateMyRecruiterProfile(userId: string, profileId: string, updateDto: UpdateRecruiterProfileDto) {
+    async updateMyRecruiterProfile(userId: string, profileId: string, updateDto: UpdateRecruiterProfileDto) : Promise<void> {
         const profile = await this.recruiterProfilesRepository.getOneById(profileId);
         await profile.checkOwnProfile(userId);
         const expirationAt = generateExpirationDate(this.ExpirationTermDays);
@@ -56,7 +56,7 @@ export class RecruiterProfilesService {
     }
 
     @Transactional()
-    async deleteMyRecruiterProfile(userId: string, profileId: string) {
+    async deleteMyRecruiterProfile(userId: string, profileId: string) : Promise<void> {
         const user = await this.usersRepository.findOneById(userId);
         const profile = await this.recruiterProfilesRepository.getOneById(profileId);
         await profile.checkOwnProfile(user.id);

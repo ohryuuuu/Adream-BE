@@ -14,10 +14,10 @@ export class RecruitmentsController {
         private recruitmentsService : RecruitmentsService
     ) {}
 
-    @Get()
-    async findRecruitment(@Query() query : PaginateQuery) {
-        return await this.recruitmentsService.getRecruitments(query);
-    }
+    // @Get()
+    // async findRecruitment(@Query() query : PaginateQuery) {
+    //     return await this.recruitmentsService.getRecruitments(query);
+    // }
 
     @Get('/:recruitment_id')
     async getRecruitmentDetail(@Param('recruitment_id',ParseIntPipe) recruitmentId: number) {

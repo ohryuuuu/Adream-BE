@@ -36,7 +36,7 @@ export class NationalTaxService {
         }
     }
 
-    async checkBusinessWorking(BusinessDto : BusinessDto) {
+    async checkBusinessWorking(BusinessDto : BusinessDto) : Promise<void> {
         const isWorking = await this.isBusinessWorking(BusinessDto);
         if(!isWorking) throw new BusinessIsNotWorkingException();
     }
