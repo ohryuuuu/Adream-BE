@@ -22,7 +22,7 @@ export class RecruitmentsService {
     async addRecruitment(userId:string, addDto: AddRecruitmentDto) {
         const recruiterProfile = await this.recruiterProfileRepository.getOneById(addDto.recruiterProfileId);
         await recruiterProfile.checkOwnProfile(userId);
-        await this.checkDeadline(addDto.deadline);
+        await this.validateDeadline(addDto.deadline);
         const newRecruitment = this.recruitmentsRepository.create({     
             title: addDto.title,
             description : addDto.description,
@@ -41,7 +41,7 @@ export class RecruitmentsService {
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
         const recruiterProfile = await recruitment?.recruiterProfile;
         await recruiterProfile.checkOwnProfile(userId);
-        await this.checkDeadline(editDto.deadline);
+        await this.validateDeadline(editDto.deadline);
         await this.recruitmentsRepository.update(recruitmentId, { 
             title: editDto.title,
             description : editDto.description,
@@ -55,11 +55,12 @@ export class RecruitmentsService {
 
     @Transactional()
     async reviewRecruitment(recruitmentId:number, reviewDto: ReviewRecruitmentDto) :Promise<void> {
+        await this.recruitmentsRepository.updateReview(recruitmentId, reviewDto);
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
-        recruitment.review.content = reviewDto.content;
-        recruitment.review.status = reviewDto.status;
-        await recruitment.save();
         //알림날리기
+        // const recrulterProfile = await recruitment?.recruiterProfile;
+        // const writer = await recrulterProfile?.user;
+        // await this.alarmsService.send(writer.id, `${writer.name}님 게시글 상태가 ${reviewDto.status}로 변경되었습니다.`);
     }
 
     @Transactional()
@@ -77,7 +78,7 @@ export class RecruitmentsService {
     async getRecruitments(query : PaginateQuery) {}
 
 
-    private async checkDeadline(deadline: Date) {
+    private async validateDeadline(deadline: Date) {
         const nowDateTime = new Date();
         const deadlineDateTime = new Date(deadline);
         const minDateTime = new Date(nowDateTime.getTime() +  (1 * 24 * 36000));

@@ -16,12 +16,12 @@ export class InfluencerCategoriesService {
 
     async addInfluencerCategory(addDto: AddInfluencerCategoryDto) : Promise<void> {
         const newCategory = this.influencerCategoriesRepository.create(addDto);
-        await newCategory.save();
+        await this.influencerCategoriesRepository.save(newCategory);
     }
 
     async deleteInfluencerCategory(influencerCategoryId: string) : Promise<void> {
         const influencerCategory = await this.influencerCategoriesRepository.getOneById(influencerCategoryId);
-        await influencerCategory.remove();
+        await this.influencerCategoriesRepository.remove(influencerCategory);
     }
 
 }

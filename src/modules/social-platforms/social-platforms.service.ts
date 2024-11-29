@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { YoutubeService } from './youtube.service';
 import { InstagramService } from './instagram.service';
 import { SocialPlatform } from './constant/social-platform.enum';
-import { SocialProfile } from './constant/social-platform-service.interface';
+import { SocialProfilePayload } from './interfaces/social-profile-payload.interface';
 
 @Injectable()
 export class SocialPlatformsService {
@@ -13,7 +13,7 @@ export class SocialPlatformsService {
 
 
     async getSocialProfiileByTagId(platform:SocialPlatform, tagId:string) {
-        let socialProfile: SocialProfile = null;
+        let socialProfile: SocialProfilePayload = null;
         if(platform === SocialPlatform.YOUTUBE) {
             socialProfile = await this.youtubeService.findProfileByTagId(tagId);
         } else if(platform === SocialPlatform.INSTAGRAM) {

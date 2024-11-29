@@ -14,13 +14,11 @@ export class UpdateRecruiterProfileDto {
     @Expose()
     @IsNotEmpty()
     @ValidateNested()
-    proofDto : ProofDto;
+    proof : ProofDto;
 
     @Expose()
     @IsNotEmpty()
     @IsString()
     contactEmail: string;
-
-
 
 }

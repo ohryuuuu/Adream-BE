@@ -1,7 +1,7 @@
 import { CustomRepository } from "src/config/typeorm/typeorm-ex.decorator";
 import { InfluencerProfile } from "./influencer-profile.entity";
 import { Repository } from "typeorm";
-import { NotFoundException } from "@nestjs/common";
+import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
 import { VerifyStatus } from "./constants/verify-status.enum";
 import { SocialPlatform } from "../social-platforms/constant/social-platform.enum";
 
@@ -37,9 +37,11 @@ export class InfluencerProfileRepository extends Repository<InfluencerProfile> {
     
 
     async updateVerifyStatus(id:string, verifyStatus: VerifyStatus) {
-        await this.update(id, {
+        const result =  await this.update(id, {
             verifyStatus
         });
+        if(!result.affected) new HttpException("", HttpStatus.NOT_MODIFIED);
     }
+
 
 }

@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { SocialPlatformService, SocialProfile } from "./constant/social-platform-service.interface";
+import { SocialPlatformService } from "./interfaces/social-platform-service.interface";
 import { youtube_v3 } from "@googleapis/youtube";
 import { Builder } from "builder-pattern";
+import { SocialProfilePayload } from "./interfaces/social-profile-payload.interface";
 
 
 @Injectable()
@@ -17,7 +18,7 @@ export class YoutubeService implements SocialPlatformService {
         });
     }
 
-    async findProfileByTagId(tagId:string) : Promise<SocialProfile> {
+    async findProfileByTagId(tagId:string) : Promise<SocialProfilePayload> {
         tagId = "@" + tagId.replace("@", "");
         const {data} = await this.api.channels.list({
             part : ["snippet", "statistics"],
@@ -25,7 +26,7 @@ export class YoutubeService implements SocialPlatformService {
         });
         const item = data?.items?.[0];
         if(!item) return null;
-        const socialProfile = Builder<SocialProfile>()
+        const socialProfile = Builder<SocialProfilePayload>()
         .tagId(tagId)
         .bio(item.snippet.description)
         .img(item.snippet.thumbnails.default.url)

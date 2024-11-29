@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { InfluencerProfilesService } from './influencer-profiles.service';
 import { GetUserId } from '../auth/decorators/get-user-id.decorator';
 import { AddMyInfluencerProfileDto } from './dto/req/add-my-influencer-profile.dto';
+import { UpdateMyInfluencerProfileDto } from './dto/req/update-my-influencer-profile.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt_auth.guard';
 
 @Controller('influencer-profiles')
+@UseGuards(JwtAuthGuard)
 export class InfluencerProfilesController {
 
     constructor(
@@ -23,6 +26,12 @@ export class InfluencerProfilesController {
     @Post('my')
     async addMyInfluencerProfile(@GetUserId() userId:string, @Body() addMyInfluencerProfileDto : AddMyInfluencerProfileDto) {
         return await this.influencerProfilesService.addMyInfluencerProfile(userId, addMyInfluencerProfileDto);
+    }
+
+    @Put("/:influencer_profile_id")
+    async updateMyInfluencerProfile(@GetUserId() userId:string, @Param('influencer_profile_id') influencerProfileId: string, @Body() updateMyInfluencerProfileDto : UpdateMyInfluencerProfileDto) {
+        console.log(userId);
+        return await this.influencerProfilesService.updateMyInfluencerProfile(userId, influencerProfileId, updateMyInfluencerProfileDto);
     }
 
     @Get('/:influencer_profile_id/verify_code')

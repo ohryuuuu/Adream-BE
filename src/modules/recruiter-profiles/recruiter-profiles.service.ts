@@ -45,8 +45,13 @@ export class RecruiterProfilesService {
         const profile = await this.recruiterProfilesRepository.getOneById(profileId);
         await profile.checkOwnProfile(userId);
         const expirationAt = generateExpirationDate(this.ExpirationTermDays);
-        await this.recruiterProfilesRepository.update(profileId, { ...updateDto, expirationAt });
         if(updateDto.business.number !== profile.business.number) throw new BusinessNumIsNotSameException();
+        await this.recruiterProfilesRepository.update(profileId, {
+            business : updateDto.business,
+            contactEmail : updateDto.contactEmail,
+            proof : updateDto.proof,
+            expirationAt
+        })
         await this.nationalTaxService.checkBusinessWorking(updateDto.business);
     }
 
