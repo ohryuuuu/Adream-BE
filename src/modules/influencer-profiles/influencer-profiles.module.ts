@@ -6,10 +6,11 @@ import { InfluencerProfileRepository } from './influencer-profiles.repository';
 import { UsersRepository } from '../users/users.repository';
 import { InfluencerCategoriesRepository } from '../influencer-categories/influencer-categories.repository';
 import { CacheModule } from '@nestjs/cache-manager';
+import { SocialPlatformsModule } from 'src/modules/social-platforms/social-platforms.module';
 
 @Module({
-  imports: [CacheModule.register(), TypeOrmExModule.forCustomRepository([InfluencerProfileRepository, UsersRepository, InfluencerCategoriesRepository])],
+  imports: [SocialPlatformsModule, CacheModule.register(), TypeOrmExModule.forCustomRepository([InfluencerProfileRepository, UsersRepository, InfluencerCategoriesRepository])],
   controllers: [InfluencerProfilesController],
-  providers: [InfluencerProfilesService]
+  providers: [InfluencerProfilesService],
 })
 export class InfluencerProfilesModule {}

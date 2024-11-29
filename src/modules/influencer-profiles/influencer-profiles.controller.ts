@@ -1,8 +1,7 @@
-import { Body, Controller, Delete, Get, Param, ParseEnumPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { InfluencerProfilesService } from './influencer-profiles.service';
 import { GetUserId } from '../auth/decorators/get-user-id.decorator';
 import { AddMyInfluencerProfileDto } from './dto/req/add-my-influencer-profile.dto';
-import { SocialPlatform } from './constants/social-platform.enum';
 
 @Controller('influencer-profiles')
 export class InfluencerProfilesController {
@@ -26,14 +25,14 @@ export class InfluencerProfilesController {
         return await this.influencerProfilesService.addMyInfluencerProfile(userId, addMyInfluencerProfileDto);
     }
 
-    @Get('/verify_url')
-    async getVerify(@Query('platform') platform: SocialPlatform) {
-        return await this.influencerProfilesService.getVerifyUrl(platform);
+    @Get('/:influencer_profile_id/verify_code')
+    async getVerify(@Param('influencer_profile_id') influencerProfileId: string) {
+        return await this.influencerProfilesService.getVerifyCode(influencerProfileId);
     }
 
     @Post('/:influencer_profile_id/verify')
     async verifySocialAccount(@Param('influencer_profile_id') influencerProfileId: string) {
-        return await this.influencerProfilesService.verifySocialAccount(influencerProfileId);
+        return await this.influencerProfilesService.verifyProfile(influencerProfileId);
     }
 
 

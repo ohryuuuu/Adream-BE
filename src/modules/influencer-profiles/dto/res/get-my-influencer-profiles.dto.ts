@@ -1,13 +1,13 @@
 import { InfluencerCategory } from "src/modules/influencer-categories/influencer-category.entity";
-import { SocialPlatform } from "../../constants/social-platform.enum";
 import { InfluencerProfile } from "../../influencer-profile.entity";
 import { VerifyStatus } from "../../constants/verify-status.enum";
+import { SocialPlatform } from "src/modules/social-platforms/constant/social-platform.enum";
 
 export class GetMyInfluencerProfilesItemDto {
     
     id: string;
     tagId: string;
-    followerCnt: string;
+    followerCnt: number;
     platform: SocialPlatform;
     contactEmail: string;
     verifyStatus: VerifyStatus;

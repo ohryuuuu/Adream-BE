@@ -2,8 +2,8 @@ import { CustomRepository } from "src/config/typeorm/typeorm-ex.decorator";
 import { InfluencerProfile } from "./influencer-profile.entity";
 import { Repository } from "typeorm";
 import { NotFoundException } from "@nestjs/common";
-import { SocialPlatform } from "./constants/social-platform.enum";
 import { VerifyStatus } from "./constants/verify-status.enum";
+import { SocialPlatform } from "../social-platforms/constant/social-platform.enum";
 
 @CustomRepository(InfluencerProfile)
 export class InfluencerProfileRepository extends Repository<InfluencerProfile> {

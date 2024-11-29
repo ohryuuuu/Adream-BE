@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Comment, SocialPlatformService, SocialUser } from "./social-platform-service.interface";
+import { SocialPlatformService, SocialProfile } from "./constant/social-platform-service.interface";
 import { youtube_v3 } from "@googleapis/youtube";
-import * as url from "url";
 import { Builder } from "builder-pattern";
 
 
@@ -18,34 +17,25 @@ export class YoutubeService implements SocialPlatformService {
         });
     }
 
-    async findSocialUserComment(contentUrl:string ,tagId:string, pageToken=null) : Promise<Comment> {
-        const urlObj = url.parse(contentUrl, true);
-        const videoId = urlObj.query['v'] as string;
-        if(!videoId) throw new Error("올바른 유튜브 영상 URL을 보내주세요.");
-        const { data } = await this.api.commentThreads.list({
-            part : ["snippet"],
-            videoId,
-            pageToken
+    async findProfileByTagId(tagId:string) : Promise<SocialProfile> {
+        tagId = "@" + tagId.replace("@", "");
+        const {data} = await this.api.channels.list({
+            part : ["snippet", "statistics"],
+            forHandle : tagId
         });
-        for(let idx in data.items) {
-            const item  = data.items[idx];
-            const authorDisplayName = item.snippet.topLevelComment.snippet.authorDisplayName;
-            const textDisplay = item.snippet.topLevelComment.snippet.textDisplay;
-            if(authorDisplayName.replace("@", "") === tagId) {
-                const comment = Builder<Comment>(Comment)
-                .tagId(tagId)
-                .content(textDisplay)
-                .build();
-                return comment;
-            }
-        }
-        if(!data.nextPageToken) return null;
-        return await this.findSocialUserComment(contentUrl, tagId, data.nextPageToken);
+        const item = data?.items?.[0];
+        if(!item) return null;
+        const socialProfile = Builder<SocialProfile>()
+        .tagId(tagId)
+        .bio(item.snippet.description)
+        .img(item.snippet.thumbnails.default.url)
+        .followerCnt(Number(item.statistics.subscriberCount))
+        .build();
+        return socialProfile;
     }
 
-    async findSocialUserInfo(tagId:string) : Promise<SocialUser> {
+    // async findProfileById() {
 
-        return new SocialUser();
-    }
+    // }
 
 }

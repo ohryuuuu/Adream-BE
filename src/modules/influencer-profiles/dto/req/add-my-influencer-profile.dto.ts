@@ -1,5 +1,6 @@
-import { SocialPlatform } from "../../constants/social-platform.enum";
-import { IsArray, IsEnum, IsString, Max, Min } from "class-validator";
+
+import {  IsEnum, IsString } from "class-validator";
+import { SocialPlatform } from "src/modules/social-platforms/constant/social-platform.enum";
 
 export class AddMyInfluencerProfileDto {
 

@@ -18,7 +18,7 @@ export class InfluencerProfile extends BaseEntity {
     @Column({
         default:0
     })
-    followerCnt: string;
+    followerCnt: number;
 
     @Column({
         type: "enum",
@@ -32,19 +32,18 @@ export class InfluencerProfile extends BaseEntity {
     contactEmail: string;
 
     @Column({
+        type :"text"
+    })
+    img: string;
+
+    @Column({
         type:"enum",
         enum : VerifyStatus
     })
-    verifyStatus : VerifyStatus = VerifyStatus.BEFORE;
+    verifyStatus: VerifyStatus = VerifyStatus.BEFORE;
 
     @CreateDateColumn()
     createdAt: Date;
-
-    @UpdateDateColumn()
-    updateAt: Date;
-
-    @DeleteDateColumn()
-    deletedAt: Date;
 
     @ManyToOne(type => User, {
         lazy: true

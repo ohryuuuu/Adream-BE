@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InfluencerProfileRepository } from './influencer-profiles.repository';
 import { GetMyInfluencerProfilesItemDto } from './dto/res/get-my-influencer-profiles.dto';
 import { AddMyInfluencerProfileDto } from './dto/req/add-my-influencer-profile.dto';
@@ -10,8 +10,8 @@ import { generateRandomStr } from 'src/common/utils/random-str';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { CACHE_KEYS } from 'src/common/constants/cache-keys';
-import { VerifyInfoDto } from './dto/res/verify-info';
-import { SocialPlatform } from '../social-platforms/constant/social-platform.enum';
+import { SocialPlatformsService } from 'src/modules/social-platforms/social-platforms.service';
+import { UpdateMyInfluencerProfileDto } from './dto/req/update-my-influencer-profile.dto';
 
 
 @Injectable()
@@ -20,17 +20,13 @@ export class InfluencerProfilesService {
     constructor(
         private influencerProfilesRepository : InfluencerProfileRepository,
         private usersRepository : UsersRepository,
-        private categoryRepository : InfluencerCategoriesRepository,
+        private categoriesRepository : InfluencerCategoriesRepository,
         @Inject(CACHE_MANAGER) 
         private cacheManager: Cache,
+        private socialPlatformsService : SocialPlatformsService,
     ) {}
 
     readonly VERIFY_EXP_MS = 60000*30;
-    readonly VERIFYURL = {
-        [SocialPlatform.INSTAGRAM] :"https://www.youtube.com/watch?v=E4nvzs8uSDc",
-        [SocialPlatform.YOUTUBE] :""
-    };
-
 
     async getMyInfluencerProfiles(userId:string) : Promise<GetMyInfluencerProfilesItemDto[]> {
         const influencerProfiles = await this.influencerProfilesRepository.findByUserId(userId);
@@ -47,64 +43,51 @@ export class InfluencerProfilesService {
 
     async addMyInfluencerProfile(userId:string, addDto : AddMyInfluencerProfileDto) {
         const user = await this.usersRepository.getOneById(userId);
-        const categories = await this.categoryRepository.findByCategoryIds(addDto.categoryIds);
+        const categories = await this.categoriesRepository.findByCategoryIds(addDto.categoryIds);
         const sameprofile = await this.influencerProfilesRepository.findSameOneInMyInfluencerProfiles(addDto.platform, addDto.tagId, userId);
-        if(categories.length < 1 || categories.length > 3) throw new BadRequestException();
         if(sameprofile) throw new ProfileInfoAlreadyExistsException();
+        const socialInfo = await this.socialPlatformsService.getSocialProfiileByTagId(addDto.platform, addDto.tagId);
         const newInfluencerProfile = this.influencerProfilesRepository.create({
-            platform : addDto.platform,
-            tagId : addDto.tagId,
-            contactEmail : addDto.contactEmail,
+            platform: addDto.platform,
+            tagId: addDto.tagId,
+            contactEmail: addDto.contactEmail,
+            followerCnt: socialInfo.followerCnt,
+            img: socialInfo.img,
             categories,
             user,
         });
-        await this.influencerProfilesRepository.save(newInfluencerProfile);
+        await newInfluencerProfile.save();
     }
 
-    async startVerifyingProfile(influencerProfileId: string) {
+    async updateMyInfluencerProfile(userId:string, influencerProfileId : string, updateDto : UpdateMyInfluencerProfileDto) {
         const influencerProfile = await this.influencerProfilesRepository.getOneById(influencerProfileId);
-        if(influencerProfile.verifyStatus === VerifyStatus.COMPLETE) throw new BadRequestException();
+        await influencerProfile.checkOwnProfile(userId);
+        const categories = await this.categoriesRepository.findByCategoryIds(updateDto.categoryIds);
+        const socialInfo = await this.socialPlatformsService.getSocialProfiileByTagId(influencerProfile.platform, influencerProfile.tagId);
+        influencerProfile.categories = categories;
+        influencerProfile.contactEmail = updateDto.contactEmail;
+        influencerProfile.img = socialInfo.img;
+        influencerProfile.followerCnt = socialInfo.followerCnt;
+        await influencerProfile.save();
+    }
+
+    async getVerifyCode(influencerProfileId: string) {
+        const influencerProfile = await this.influencerProfilesRepository.getOneById(influencerProfileId);
         const verifyCode = generateRandomStr(6);
         await this.cacheManager.set(CACHE_KEYS.INFLUENCER_PROFILE_VERIFY_CODE(influencerProfileId), verifyCode, this.VERIFY_EXP_MS);
         influencerProfile.verifyStatus = VerifyStatus.PROCESSING;
         await influencerProfile.save();
-        return new VerifyInfoDto(verifyCode, this.VERIFYURL[influencerProfile.platform]);
-    }
-
-    async processVerifingYoutubeProfile() {
-
-    }
-
-    async processVerifingInstagramProfile() {
-
+        return verifyCode;
     }
 
 
-
-    /******************** */
-
-    // async getVerifyUrl(platform : SocialPlatform) {
-    //     if(platform === SocialPlatform.YOUTUBE) {
-    //         return this.YOUTUBE_VERIFY_URL;
-    //     } else if (platform === SocialPlatform.INSTAGRAM) {
-    //         return this.INSTAGRAM_VERIFY_URL;
-    //     }
-    // }
-
-    // async verifySocialAccount(influencerProfileId: string) {
-    //     const influencerProfile = await this.influencerProfilesRepository.getOneById(influencerProfileId);
-    //     let comment : Comment = null;
-    //     if(influencerProfile.platform === SocialPlatform.YOUTUBE) {
-    //         comment = await this.youtubeService.findSocialUserComment(this.YOUTUBE_VERIFY_URL, influencerProfile.tagId);
-    //     } else if (influencerProfile.platform === SocialPlatform.INSTAGRAM) {
-    //         comment = await this.instagramService.findSocialUserComment(this.INSTAGRAM_VERIFY_URL, influencerProfile.tagId);
-    //     }
-    //     if(!comment) throw new BadRequestException("인증 실패");
-    //     await this.influencerProfilesRepository.update(influencerProfileId, {
-    //         verifyStatus : VerifyStatus.COMPLETE,
-    //     });
-    // }
-
-
+    async verifyProfile(influencerProfileId:string) {
+        const influencerProfile = await this.influencerProfilesRepository.getOneById(influencerProfileId);
+        const socialInfo = await this.socialPlatformsService.getSocialProfiileByTagId(influencerProfile.platform ,influencerProfile.tagId);
+        const verifyCode = await this.cacheManager.get(CACHE_KEYS.INFLUENCER_PROFILE_VERIFY_CODE(influencerProfileId)) as string;
+        if(!socialInfo.bio.includes(verifyCode)) throw new HttpException("인증코드가 확인되지 않습니다.", HttpStatus.NON_AUTHORITATIVE_INFORMATION);
+        influencerProfile.verifyStatus = VerifyStatus.COMPLETE;
+        await influencerProfile.save();
+    }
 
 }
