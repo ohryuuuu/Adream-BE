@@ -6,7 +6,7 @@ import { VerifyStatus } from "./constants/verify-status.enum";
 import { SocialPlatform } from "../social-platforms/constant/social-platform.enum";
 
 @CustomRepository(InfluencerProfile)
-export class InfluencerProfileRepository extends Repository<InfluencerProfile> {
+export class InfluencerProfilesRepository extends Repository<InfluencerProfile> {
 
     async findByUserId(userId: string) {
         return await this.findBy({

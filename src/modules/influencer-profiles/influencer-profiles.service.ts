@@ -1,5 +1,5 @@
-import { BadRequestException, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { InfluencerProfileRepository } from './influencer-profiles.repository';
+import { Inject, Injectable } from '@nestjs/common';
+import { InfluencerProfilesRepository } from './influencer-profiles.repository';
 import { GetMyInfluencerProfilesItemDto } from './dto/res/get-my-influencer-profiles.dto';
 import { AddMyInfluencerProfileDto } from './dto/req/add-my-influencer-profile.dto';
 import { UsersRepository } from '../users/users.repository';
@@ -20,7 +20,7 @@ import { VerifyCodeIsNotCorrectException } from './exceptions/verify-code-is-not
 export class InfluencerProfilesService {
 
     constructor(
-        private influencerProfilesRepository : InfluencerProfileRepository,
+        private influencerProfilesRepository : InfluencerProfilesRepository,
         private usersRepository : UsersRepository,
         private categoriesRepository : InfluencerCategoriesRepository,
         @Inject(CACHE_MANAGER) 
