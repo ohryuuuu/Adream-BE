@@ -1,7 +1,6 @@
 import { IsNumber, IsString, IsUUID } from "class-validator";
 
-export class ApplicationDto {
-
+export class SubmitApplicationDto {
 
     @IsUUID()
     influencerProfileId:string;
@@ -11,7 +10,5 @@ export class ApplicationDto {
 
     @IsString()
     appeal: string;
-
-    
 
 }

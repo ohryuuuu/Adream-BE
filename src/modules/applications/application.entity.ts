@@ -15,14 +15,14 @@ export class Application extends BaseEntity {
     appeal: string;
 
     @ManyToOne(type => Recruitment, {
-        lazy: true
+        eager: true
     })
-    recruitment: Recruitment | Promise<InfluencerProfile>;
+    recruitment: Recruitment;
 
     @ManyToOne(type => InfluencerProfile, {
-        lazy: true,
+        eager: true,
     })
-    influencerProfile: InfluencerProfile | Promise<InfluencerProfile>;
+    influencerProfile: InfluencerProfile;
 
     @CreateDateColumn()
     createdAt: Date;

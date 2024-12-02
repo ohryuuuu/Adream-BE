@@ -1,9 +1,9 @@
-import { PriceRange } from "src/modules/recruitments/constants/price-range.enum";
-import { ReviewStatus } from "src/modules/recruitments/constants/review-status.enum";
-import { SupportMethod } from "src/modules/recruitments/constants/support-method.enum";
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { PriceRange } from "src/modules/recruitments/enums/price-range.enum";
+import { AnotherSupport } from "src/modules/recruitments/enums/another-support.enum";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { RecruiterProfile } from "../recruiter-profiles/recruiter-profile.entity";
 import { AdminReview } from "./children-entities/review.entity";
+import { InfluencerCategory } from "../influencer-categories/influencer-category.entity";
 
 @Entity('recruitments')
 export class Recruitment extends BaseEntity {
@@ -21,23 +21,16 @@ export class Recruitment extends BaseEntity {
 
     @Column({
         type: "enum",
-        enum: SupportMethod
+        enum: AnotherSupport
     })
-    supportMethodA: SupportMethod;
-
-    @Column({
-        type: "enum",
-        enum: SupportMethod,
-        nullable: true,
-    })
-    supportMethodB: SupportMethod;
+    anotherSupport: AnotherSupport;
 
     @Column({
         type: "enum",
         enum: PriceRange,
         nullable: true
     })
-    priceRangeType: PriceRange;
+    priceRange: PriceRange;
 
     @Column({
         nullable: true
@@ -54,11 +47,25 @@ export class Recruitment extends BaseEntity {
     review : AdminReview;
 
     @ManyToOne(type => RecruiterProfile, {
-        lazy:true,
+        eager:true,
     })
-    @JoinColumn({
-        name : "recruiterProfileId"
+    @JoinColumn()
+    recruiterProfile?: RecruiterProfile;
+
+    @ManyToMany(() => InfluencerCategory, {
+        eager: true
     })
-    recruiterProfile?: RecruiterProfile | Promise<RecruiterProfile>;
+    @JoinTable()
+    preferCategories : InfluencerCategory[];
+
+    @Column({
+        default: 0
+    })
+    applicationCnt:number;
+
+    @Column({
+        default: 0
+    })
+    viewCnt:number;
 
 }

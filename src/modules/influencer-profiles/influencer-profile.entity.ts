@@ -2,8 +2,8 @@ import { User } from "src/modules/users/user.entity";
 import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { InfluencerCategory } from "../influencer-categories/influencer-category.entity";
 import { ProfileIsNotOwnException } from "./exceptions/profile-is-not-own.exception";
-import { VerifyStatus } from "./constants/verify-status.enum";
-import { SocialPlatform } from "../social-platforms/constant/social-platform.enum";
+import { VerifyStatus } from "./enums/verify-status.enum";
+import { SocialPlatform } from "../social-platforms/enums/social-platform.enum";
 
 
 @Entity('influencer_profiles')

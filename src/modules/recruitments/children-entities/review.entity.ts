@@ -1,5 +1,5 @@
 import { Column } from "typeorm";
-import { ReviewStatus } from "../constants/review-status.enum";
+import { ReviewStatus } from "../enums/review-status.enum";
 
 export class AdminReview {
     @Column({

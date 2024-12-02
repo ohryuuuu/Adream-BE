@@ -1,6 +1,6 @@
 import {  IsDate, IsEnum, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
-import { SupportMethod } from "../../constants/support-method.enum";
-import { PriceRange } from "../../constants/price-range.enum";
+import { AnotherSupport } from "../../enums/another-support.enum";
+import { PriceRange } from "../../enums/price-range.enum";
 import { Exclude, Expose } from "class-transformer";
 
 
@@ -20,18 +20,14 @@ export class AddRecruitmentDto {
     description : string;
 
     @Expose()
-    @IsEnum(SupportMethod)
-    supportMethodA: SupportMethod;
-
-    @Expose()
+    @IsEnum(AnotherSupport)
     @IsOptional()
-    @IsEnum(SupportMethod)
-    supportMethodB: SupportMethod;
+    anotherSupport: AnotherSupport;
 
     @Expose()
     @IsOptional()
     @IsEnum(PriceRange)
-    priceRangeType: PriceRange;
+    priceRange: PriceRange;
 
     @Expose()
     @IsOptional()
@@ -42,17 +38,10 @@ export class AddRecruitmentDto {
     @IsDate()
     deadline: Date;
 
-
-    getEntityLike() {
-        return {
-            title : this.title,
-            description : this.description,
-            supportMethodA: this.supportMethodA,
-            supportMethodB: this.supportMethodB,
-            priceRangeType: this.priceRangeType,
-            price: this.price,
-            deadline: this.deadline,
-        }
-    }
+    @Expose()
+    @IsUUID('all', {
+        each:true
+    })
+    preferCategoryIds: string[];
 
 }

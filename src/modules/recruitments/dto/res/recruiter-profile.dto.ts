@@ -1,4 +1,4 @@
-import { BusinessType } from "src/modules/recruiter-profiles/constants/business-type.enum";
+import { BusinessType } from "src/modules/recruiter-profiles/enums/business-type.enum";
 import { RecruiterProfile } from "src/modules/recruiter-profiles/recruiter-profile.entity";
 
 export class RecruiterProfileDto {

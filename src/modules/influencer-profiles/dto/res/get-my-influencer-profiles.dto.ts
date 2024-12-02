@@ -1,7 +1,7 @@
 import { InfluencerCategory } from "src/modules/influencer-categories/influencer-category.entity";
 import { InfluencerProfile } from "../../influencer-profile.entity";
-import { VerifyStatus } from "../../constants/verify-status.enum";
-import { SocialPlatform } from "src/modules/social-platforms/constant/social-platform.enum";
+import { VerifyStatus } from "../../enums/verify-status.enum";
+import { SocialPlatform } from "src/modules/social-platforms/enums/social-platform.enum";
 
 export class GetMyInfluencerProfilesItemDto {
     

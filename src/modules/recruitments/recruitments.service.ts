@@ -7,6 +7,12 @@ import { ReviewRecruitmentDto } from './dto/req/review-recruitment.dto';
 import { Transactional } from 'typeorm-transactional';
 import { EditRecruitmentDto } from './dto/req/edit-recruitment.dto';
 import { RecruitmentDetailDto } from './dto/res/recruitment-detail.dto';
+import { InfluencerCategoriesRepository } from '../influencer-categories/influencer-categories.repository';
+import { ReviewStatus } from './enums/review-status.enum';
+import { PaginateQueryDto } from 'src/common/dto/req/paginate-query.dto';
+import { PaginationDto } from 'src/common/dto/res/pagination.dto';
+import { RecruitmentListItemDto } from './dto/res/recruitment-list-item.dto';
+import { SearchRecruitmentsDto } from './dto/req/search-recruitment.dto';
 
 
 @Injectable()
@@ -15,6 +21,7 @@ export class RecruitmentsService {
     constructor(
         private recruiterProfileRepository: RecruiterProfilesRepository,
         private recruitmentsRepository: RecruitmentsRepository,
+        private influencerCategoriesRepository :InfluencerCategoriesRepository
     ) {}
 
     @Transactional()
@@ -22,15 +29,16 @@ export class RecruitmentsService {
         const recruiterProfile = await this.recruiterProfileRepository.getOneById(addDto.recruiterProfileId);
         await recruiterProfile.checkOwnProfile(userId);
         await this.validateDeadline(addDto.deadline);
+        const preferCategories = await this.influencerCategoriesRepository.findByIds(addDto.preferCategoryIds);
         const newRecruitment = this.recruitmentsRepository.create({     
             title: addDto.title,
             description : addDto.description,
-            supportMethodA: addDto.supportMethodA,
-            supportMethodB: addDto.supportMethodB,
-            priceRangeType: addDto.priceRangeType,
+            priceRange: addDto.priceRange,
             price: addDto.price,
+            anotherSupport: addDto.anotherSupport,
             deadline: addDto.deadline,
-            recruiterProfile
+            recruiterProfile,
+            preferCategories
         });
         await this.recruitmentsRepository.save(newRecruitment);
     }
@@ -38,44 +46,46 @@ export class RecruitmentsService {
     @Transactional()
     async editRecruitment(userId:string, recruitmentId:number, editDto:EditRecruitmentDto) : Promise<void> {
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
-        const recruiterProfile = await recruitment?.recruiterProfile;
-        await recruiterProfile.checkOwnProfile(userId);
+        await recruitment.recruiterProfile.checkOwnProfile(userId);
         await this.validateDeadline(editDto.deadline);
+        const preferCategories = await this.influencerCategoriesRepository.findByIds(editDto.preferCategoryIds);
         await this.recruitmentsRepository.update(recruitmentId, { 
             title: editDto.title,
             description : editDto.description,
-            supportMethodA: editDto.supportMethodA,
-            supportMethodB: editDto.supportMethodB,
-            priceRangeType: editDto.priceRangeType,
+            priceRange: editDto.priceRange,
+            anotherSupport: editDto.anotherSupport,
             price: editDto.price,
             deadline: editDto.deadline,
+            preferCategories,
+            review : {
+                status : ReviewStatus.WAITING,
+                content : "재심사를 대기합니다",
+            }
         });
     }
 
     @Transactional()
     async reviewRecruitment(recruitmentId:number, reviewDto: ReviewRecruitmentDto) : Promise<void> {
         await this.recruitmentsRepository.updateReview(recruitmentId, reviewDto);
-        const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
-        //알림날리기
-        // const recrulterProfile = await recruitment?.recruiterProfile;
-        // const writer = await recrulterProfile?.user;
-        // await this.alarmsService.send(writer.id, `${writer.name}님 게시글 상태가 ${reviewDto.status}로 변경되었습니다.`);
+        // const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId); 나중에 알림 날리기
     }
 
     @Transactional()
     async getRecruitmentDetail(recruitmentId: number) : Promise<RecruitmentDetailDto> {
+        await this.recruitmentsRepository.addViewCnt(recruitmentId);
         const recruitment = await this.recruitmentsRepository.getOneById(recruitmentId);
-        const recruiterProfile = await recruitment?.recruiterProfile;
-        const authorUser =  await recruiterProfile?.user;
-        const returnDto = new RecruitmentDetailDto(recruitment);
-        returnDto.setAuthor(authorUser);
-        returnDto.setRecruiterProfile(recruiterProfile);
-        return returnDto;
+        return new RecruitmentDetailDto(recruitment);
     }
 
 
-    // async getRecruitments(query : PaginateQuery) {}
-
+    async searchRecruitments(query:PaginateQueryDto) {
+        const [recruitments, cnt] = await this.recruitmentsRepository.findAndCount({
+            take:query.take,
+            skip:query.getSkip(),
+        });
+        const data = recruitments.map((recruitment) => (new RecruitmentListItemDto(recruitment)));
+        return new PaginationDto<RecruitmentListItemDto>(data, cnt, query);
+    }
 
     private async validateDeadline(deadline: Date) : Promise<void> {
         const nowDateTime = new Date();

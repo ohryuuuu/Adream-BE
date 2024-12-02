@@ -1,8 +1,7 @@
 import { CustomRepository } from "src/config/typeorm/typeorm-ex.decorator";
 import { Recruitment } from "./recruitment.entity";
-import { MoreThan, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
-import { ReviewStatus } from "./constants/review-status.enum";
 import { AdminReview } from "./children-entities/review.entity";
 
 
@@ -24,5 +23,11 @@ export class RecruitmentsRepository extends Repository<Recruitment> {
         if(!result.affected) throw new HttpException("", HttpStatus.NOT_MODIFIED);
     }
 
+
+    async addViewCnt(id:number) {
+        await this.update(id, {
+            viewCnt: () => 'viewCnt + 1',
+        });
+    }
 
 }

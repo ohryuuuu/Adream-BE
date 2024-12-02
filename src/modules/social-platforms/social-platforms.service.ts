@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { YoutubeService } from './youtube.service';
 import { InstagramService } from './instagram.service';
-import { SocialPlatform } from './constant/social-platform.enum';
+import { SocialPlatform } from './enums/social-platform.enum';
 import { SocialProfilePayload } from './interfaces/social-profile-payload.interface';
 
 @Injectable()

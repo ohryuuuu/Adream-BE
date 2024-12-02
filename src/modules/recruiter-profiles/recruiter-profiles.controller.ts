@@ -16,12 +16,7 @@ export class RecruiterProfilesController {
         private nationalTaxService : NationalTaxService,
     ) {}
 
-    @Get('my')
-    async getMyRecruiterProfiles(@GetUserId() userId : string) {
-        return await this.recruiterProfilesService.getMyRecruiterProfiles(userId);
-    }
-
-    @Post('my')
+    @Post()
     async addMyRecruiterProfile(@GetUserId() userId: string, @Body() addRecruiterProfileDto: AddRecruiterProfileDto) {
         return await this.recruiterProfilesService.addMyRecruiterProfile(userId, addRecruiterProfileDto);
     }

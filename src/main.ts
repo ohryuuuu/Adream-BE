@@ -11,6 +11,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({
     transform:true,
+    whitelist: true, // DTO에 정의되지 않은 프로퍼티는 자동으로 필터링
+    forbidNonWhitelisted: true, // DTO에 없는 프로퍼티가 들어오면 에러 발생
     transformOptions:{
       enableImplicitConversion:true,
     }

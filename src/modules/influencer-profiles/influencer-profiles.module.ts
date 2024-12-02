@@ -12,5 +12,6 @@ import { SocialPlatformsModule } from 'src/modules/social-platforms/social-platf
   imports: [SocialPlatformsModule, CacheModule.register(), TypeOrmExModule.forCustomRepository([InfluencerProfilesRepository, UsersRepository, InfluencerCategoriesRepository])],
   controllers: [InfluencerProfilesController],
   providers: [InfluencerProfilesService],
+  exports : [InfluencerProfilesService]
 })
 export class InfluencerProfilesModule {}

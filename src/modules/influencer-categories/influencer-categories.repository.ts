@@ -14,7 +14,7 @@ export class InfluencerCategoriesRepository extends Repository<InfluencerCategor
         return influencerCategory;
     }
 
-    async findByCategoryIds(categoryIds : string[]) {
+    async findByIds(categoryIds : string[]) {
         const categories = await this.findBy({id:In(categoryIds)});
         return categories;
     }

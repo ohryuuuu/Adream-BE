@@ -1,5 +1,6 @@
-import { UserType } from "src/modules/users/constants/user-type.enum";
+import { UserType } from "src/modules/users/enums/user-type.enum";
 import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import * as crypto from 'crypto';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -19,7 +20,7 @@ export class User extends BaseEntity {
     phoneNumber: string;
 
     @Column()
-    password: string;
+    private password: string;
 
     @Column({
         type: "enum",
@@ -33,5 +34,23 @@ export class User extends BaseEntity {
 
     @DeleteDateColumn()
     deletedAt: Date;
+
+
+    isPasswordCorrect(password: string): boolean {
+        const hash = this.hashPassword(password);
+        return hash === this.password;
+    }
+
+    setPassword(password:string) {
+        const hashedPassword = this.hashPassword(password);
+        this.password = hashedPassword;
+    }
+
+    private hashPassword(password: string): string {
+        const hash = crypto.createHmac('sha256', process.env['CRYPTO_SECRETKEY'])
+        .update(password)
+        .digest('hex');
+        return hash;
+    }
 
 }

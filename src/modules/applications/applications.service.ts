@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ApplicationsRepository } from './applications.repository';
-import { ApplicationDto } from './dto/req/application.dto';
+import { SubmitApplicationDto } from './dto/req/submit-application.dto';
 import { RecruitmentsRepository } from '../recruitments/recruitments.repository';
 import { InfluencerProfilesRepository } from '../influencer-profiles/influencer-profiles.repository';
+import { VerifyStatus } from '../influencer-profiles/enums/verify-status.enum';
 
 @Injectable()
 export class ApplicationsService {
@@ -13,8 +14,7 @@ export class ApplicationsService {
         private influencerProfileRepository : InfluencerProfilesRepository,
     ) {}
 
-
-    async applicateToRecruitment(userId:string, applicationDto:ApplicationDto) {
+    async submitApplication(userId:string, applicationDto:SubmitApplicationDto) {
         const recruitment = await this.recruitmentsRepository.getOneById(applicationDto.recruitmentId);
         const influencerProfile = await this.influencerProfileRepository.getOneById(applicationDto.influencerProfileId);
         await influencerProfile.checkOwnProfile(userId);
@@ -28,11 +28,10 @@ export class ApplicationsService {
 
     async cancelApplication(userId:string, applicationId:string) {
         const application = await this.applicationsRepository.getOneById(applicationId);
-        const influencerProfile = await application.influencerProfile;
-        await influencerProfile.checkOwnProfile(userId);
+        await application.influencerProfile.checkOwnProfile(userId);
+        if(application.influencerProfile.verifyStatus !== VerifyStatus.COMPLETE) throw new BadRequestException();
         await this.applicationsRepository.remove(application);
     }
-
 
     
 

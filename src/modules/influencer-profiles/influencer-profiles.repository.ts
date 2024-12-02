@@ -2,8 +2,9 @@ import { CustomRepository } from "src/config/typeorm/typeorm-ex.decorator";
 import { InfluencerProfile } from "./influencer-profile.entity";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
-import { VerifyStatus } from "./constants/verify-status.enum";
-import { SocialPlatform } from "../social-platforms/constant/social-platform.enum";
+import { VerifyStatus } from "./enums/verify-status.enum";
+import { SocialPlatform } from "../social-platforms/enums/social-platform.enum";
+
 
 @CustomRepository(InfluencerProfile)
 export class InfluencerProfilesRepository extends Repository<InfluencerProfile> {
@@ -42,6 +43,8 @@ export class InfluencerProfilesRepository extends Repository<InfluencerProfile> 
         });
         if(!result.affected) new HttpException("", HttpStatus.NOT_MODIFIED);
     }
+
+
 
 
 }

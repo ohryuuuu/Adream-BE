@@ -5,7 +5,7 @@ import { AddMyInfluencerProfileDto } from './dto/req/add-my-influencer-profile.d
 import { UpdateMyInfluencerProfileDto } from './dto/req/update-my-influencer-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt_auth.guard';
 
-@Controller('influencer-profiles')
+@Controller('influencer_profiles')
 @UseGuards(JwtAuthGuard)
 export class InfluencerProfilesController {
 
@@ -13,19 +13,14 @@ export class InfluencerProfilesController {
         private influencerProfilesService: InfluencerProfilesService
     ) {}
 
-    @Get('my')
-    async getMyInfluencerProfiles(@GetUserId() userId: string) {
-        return await this.influencerProfilesService.getMyInfluencerProfiles(userId);
+    @Post()
+    async addMyInfluencerProfile(@GetUserId() userId:string, @Body() addMyInfluencerProfileDto : AddMyInfluencerProfileDto) {
+        return await this.influencerProfilesService.addMyInfluencerProfile(userId, addMyInfluencerProfileDto);
     }
 
     @Delete('/:influencer_profile_id')
     async deleteMyInfluencerProfile(@GetUserId() userId: string, @Param('influencer_profile_id') influencerProfileId: string) {
         return await this.influencerProfilesService.deleteMyInfluencerProfile(userId, influencerProfileId);
-    }
-
-    @Post('my')
-    async addMyInfluencerProfile(@GetUserId() userId:string, @Body() addMyInfluencerProfileDto : AddMyInfluencerProfileDto) {
-        return await this.influencerProfilesService.addMyInfluencerProfile(userId, addMyInfluencerProfileDto);
     }
 
     @Put("/:influencer_profile_id")
@@ -42,6 +37,11 @@ export class InfluencerProfilesController {
     @Post('/:influencer_profile_id/verify')
     async verifySocialAccount(@Param('influencer_profile_id') influencerProfileId: string) {
         return await this.influencerProfilesService.verifyProfile(influencerProfileId);
+    }
+
+    @Get("/:influencer_profile_id/application_histories")
+    async getMyApplicationHistories(@GetUserId() userId: string, @Param('influencer_profile_id') influencerProfileId: string) {
+        
     }
 
 

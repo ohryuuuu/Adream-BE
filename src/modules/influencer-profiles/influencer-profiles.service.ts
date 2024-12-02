@@ -5,7 +5,7 @@ import { AddMyInfluencerProfileDto } from './dto/req/add-my-influencer-profile.d
 import { UsersRepository } from '../users/users.repository';
 import { InfluencerCategoriesRepository } from '../influencer-categories/influencer-categories.repository';
 import { ProfileInfoAlreadyExistsException } from './exceptions/profile-info-already-exists.exception';
-import { VerifyStatus } from './constants/verify-status.enum';
+import { VerifyStatus } from './enums/verify-status.enum';
 import { generateRandomStr } from 'src/common/utils/random-str';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -48,7 +48,7 @@ export class InfluencerProfilesService {
     @Transactional()
     async addMyInfluencerProfile(userId:string, addDto : AddMyInfluencerProfileDto) : Promise<void> {
         const user = await this.usersRepository.getOneById(userId);
-        const categories = await this.categoriesRepository.findByCategoryIds(addDto.categoryIds);
+        const categories = await this.categoriesRepository.findByIds(addDto.categoryIds);
         const sameprofile = await this.influencerProfilesRepository.findSameOneInMyInfluencerProfiles(addDto.platform, addDto.tagId, userId);
         if(sameprofile) throw new ProfileInfoAlreadyExistsException();
         const socialInfo = await this.socialPlatformsService.getSocialProfiileByTagId(addDto.platform, addDto.tagId);
@@ -68,7 +68,7 @@ export class InfluencerProfilesService {
     async updateMyInfluencerProfile(userId:string, influencerProfileId : string, updateDto : UpdateMyInfluencerProfileDto) : Promise<void> {
         const influencerProfile = await this.influencerProfilesRepository.getOneById(influencerProfileId);
         await influencerProfile.checkOwnProfile(userId);
-        const categories = await this.categoriesRepository.findByCategoryIds(updateDto.categoryIds);
+        const categories = await this.categoriesRepository.findByIds(updateDto.categoryIds);
         const socialInfo = await this.socialPlatformsService.getSocialProfiileByTagId(influencerProfile.platform, influencerProfile.tagId);
         await this.influencerProfilesRepository.update(influencerProfileId, {
             categories,

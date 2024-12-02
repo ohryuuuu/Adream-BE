@@ -1,5 +1,5 @@
 import { Column } from "typeorm";
-import { BusinessType } from "../constants/business-type.enum";
+import { BusinessType } from "../enums/business-type.enum";
 
 export class Business {
     @Column()

@@ -1,6 +1,6 @@
 import { User } from "../../user.entity";
 
-export class GetMeDto {
+export class GetUserDto {
     id: string;
     name: string;
     type: string;

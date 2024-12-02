@@ -3,6 +3,7 @@ import { Application } from "./application.entity";
 import { Repository } from "typeorm";
 import { NotFoundException } from "@nestjs/common";
 
+
 @CustomRepository(Application)
 export class ApplicationsRepository extends Repository<Application> {
     
@@ -13,5 +14,7 @@ export class ApplicationsRepository extends Repository<Application> {
         if(!application) throw new NotFoundException();
         return application;
     }
+
+
 
 }

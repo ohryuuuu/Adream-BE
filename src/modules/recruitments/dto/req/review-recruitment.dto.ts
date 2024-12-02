@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from "class-validator";
-import { ReviewStatus } from "../../constants/review-status.enum";
+import { ReviewStatus } from "../../enums/review-status.enum";
 
 export class ReviewRecruitmentDto {
 
